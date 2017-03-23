@@ -24,6 +24,7 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
 ## TODO
 - [ ] Add diagram detailing the general structure of the cluster.
 - [ ] Configure PHP to listen on a UNIX socket instead of port 9000 and pass the socket file to the `fastcgi_pass` parameter in NGINX.
+- [ ] Explore a logging solution for cluster pods such as [Logstash](https://www.elastic.co/guide/en/logstash/current/docker.html "Running Logstash on Docker")
  
 ## Installation
 * Create `Secret` objects `mariadb-pass-root` and `redis-pass`.
