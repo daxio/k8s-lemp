@@ -21,5 +21,7 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
   * All TLS is terminated at `Ingress` via free Let's Encrypt certificates good for all domains on your cluster. Better yet, certificate issuance is handled automatically with the awesome [Kube Lego](https://github.com/jetstack/kube-lego "Kube Lego").
 
 ## TODO
-
 Add diagram detailing the general structure of the cluster.
+
+## Acknowledgements
+This project is based on the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes deployments mentioned previously.
