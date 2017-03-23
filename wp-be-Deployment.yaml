@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - image: chepurko/wordpress-fpm-redis:v1.0
-        name: wp-be
+        name: wp
         env:
         - name: WORDPRESS_DB_HOST
           value: mariadb # this must be the value from .metadata.name of the mariadb Service
@@ -58,13 +58,27 @@ spec:
             secretKeyRef:
               name: mariadb-pass
               key: password.txt
+        #optional since nginx can see WP on localhost
+        #ports:
+        #- containerPort: 9000
+        #  name: php
+        volumeMounts:
+        - name: wp-persistent-storage
+          mountPath: /var/www/html
+      - image: nginx:1.10
+        name: wp-nginx
         ports:
         - containerPort: 80
           name: http
         volumeMounts:
-        - name: wp-be-persistent-storage
+        - name: wp-persistent-storage
           mountPath: /var/www/html
+        - name: nginx-config
+          mountPath: /etc/nginx
       volumes:
-      - name: wp-be-persistent-storage
+      - name: wp-persistent-storage
         persistentVolumeClaim:
           claimName: wp-be-pv-claim
+      - name: nginx-config
+        configMap:
+          name: nginx-config

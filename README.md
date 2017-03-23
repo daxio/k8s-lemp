@@ -37,6 +37,11 @@ Add diagram detailing the general structure of the cluster.
   ```bash
   $ commands
   ```
+* Create a `ConfigMap` for `nginx`
+  ```bash
+  $ kubectl create configmap nginx-config --from-file=configMaps/nginx/
+  ```
+
 * Declare your new website in another YAML file
   * Make a new copy of the `wp-mywebsite.yaml` file
   * Update the following values in your new `wp-mywebsite-2.yaml` file to the corresponding website name of your choosing. E.g. `wp-mywebsite-2`, `wp-mywebsite-2-pv-claim`, etc.
@@ -48,10 +53,8 @@ Add diagram detailing the general structure of the cluster.
       * `.spec.selector.matchLabels.app`
     * `Deployment` definition
       * `.spec.template.metadata.labels.app`
-      * `.spec.template.spec.containers[0].name`
-      * Update all `.env[].value` fields to match your new database name, user, and password from `Secret`
-      * `.spec.template.spec.containers[0].volumeMounts[0].name`
-      * `.spec.template.spec.volumes[0].name` and `.volumes[0].persistentVolumeClaim.claimName`
+      * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`
+      * `.volumes[0].persistentVolumeClaim.claimName`
 
 ## Acknowledgements
 This project is based on the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes deployments mentioned previously.
