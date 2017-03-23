@@ -11,6 +11,7 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
 * **MariaDB**
   * Initially, the Wordpress/NGINX pods all interface with one `mariadb` `StatefulSet`. This is so anyone can start off with a full-fledged web farm and bring up any number of websites using one `mariadb` instance with a databse for each site. Future improvements will allow for HA and scalable clustered DBs.
   * `mariadb` also gets a `PersistentVolume` and `Secret` objects.
+  * Updating `StatefulSet` objects in Kubernetes is [currently a manual process](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations), meaning we have to execute MySQL commands in the `mariadb` pod to add new databases and users.
   
 * **Redis**
   * To reduce hits to the DB we build the WP/NGINX image with the `redis` PHP extension and include a Redis `Deployment`.
@@ -22,6 +23,35 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
 
 ## TODO
 Add diagram detailing the general structure of the cluster.
+
+## Installation
+
+## Usage
+
+### Adding a website
+* Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to a new user.
+  ```bash
+  $ commands
+  ```
+* Create a new `Secret` for your new DB user
+  ```bash
+  $ commands
+  ```
+* Declare your new website in another YAML file
+  * Make a new copy of the `wp-mywebsite.yaml` file
+  * Update the following values in your new `wp-mywebsite-2.yaml` file to the corresponding website name of your choosing. E.g. `wp-mywebsite-2`, `wp-mywebsite-2-pv-claim`, etc.
+    * `.metadata.name`
+    * `.metadata.labels.app`
+    * `Service` definition
+      * `.spec.selector.app`
+    * `PersistentVolumeClaim` definition
+      * `.spec.selector.matchLabels.app`
+    * `Deployment` definition
+      * `.spec.template.metadata.labels.app`
+      * `.spec.template.spec.containers[0].name`
+      * Update all `.env[].value` fields to match your new database name, user, and password from `Secret`
+      * `.spec.template.spec.containers[0].volumeMounts[0].name`
+      * `.spec.template.spec.volumes[0].name` and `.volumes[0].persistentVolumeClaim.claimName`
 
 ## Acknowledgements
 This project is based on the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes deployments mentioned previously.
