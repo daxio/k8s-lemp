@@ -48,7 +48,7 @@ spec:
         name: wp-be
         env:
         - name: WORDPRESS_DB_HOST
-          value: mariadb
+          value: mariadb # this must be the value from .metadata.name of the mariadb Service
         - name: WORDPRESS_DB_NAME
           value: dbBES
         - name: WORDPRESS_DB_USER
