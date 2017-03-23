@@ -24,6 +24,9 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  selector:
+    matchLabels:
+      app: wp-be
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
