@@ -60,7 +60,7 @@ spec:
               key: password.txt
         ports:
         - containerPort: 80
-          name: wp-be
+          name: http
         volumeMounts:
         - name: wp-be-persistent-storage
           mountPath: /var/www/html
