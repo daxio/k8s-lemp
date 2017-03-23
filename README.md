@@ -26,11 +26,11 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
 - [ ] Configure PHP to listen on a UNIX socket instead of port 9000 and pass the socket file to the `fastcgi_pass` parameter in NGINX.
  
 ## Installation
- Create `Secret`s `mariadb-pass-root` and `redis-pass`.
+ Create `Secret` objects `mariadb-pass-root` and `redis-pass`.
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-root.txt
   $ openssl rand -base64 20 > /tmp/redis-pass.txt
-  & kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt
+  $ kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt
   $ kubectl create secret generic redis-pass --from-file=/tmp/redis-pass.txt
   ```
 
