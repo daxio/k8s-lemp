@@ -49,7 +49,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: chepurko/wordpress-fpm-redis:v1.0
+      - image: chepurko/wordpress-fpm-redis
         name: wp
         env:
         - name: WORDPRESS_DB_HOST
