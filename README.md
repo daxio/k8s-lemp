@@ -1,7 +1,11 @@
 # Kubernetes LEMP Stack
-Kubernetes LEMP stack is a distributed LEMP stack built on top of a Kubernetes cluster. It enables anyone to deploy multiple CMSs (currently Wordpress) for any number of websites.
+Kubernetes LEMP Stack is a distributed LEMP stack built on top of a Kubernetes cluster. It enables anyone to deploy multiple CMSs (currently Wordpress) for any number of websites.
 
 Currently this supports Google Compute Engine as a cloud provider. Other providers haven't been tested (things like `PersistentVolume` and `Ingress` depend on your cloud provider).
+
+There are already stable [turn-key deployments for various CMSs](https://github.com/kubernetes/charts "Helm Charts") via Kubernetes Helm Charts, but **Kubernetes LEMP Stack** is designed more or less in the traditional LEMP fashion where you get a bucket for all of your HTML at `/var/www/html` and you may or may not use a CMS.
+
+Actually, **k8s LEMP Stack** should be able to serve as your own personal web server farm! Use it as a backend to your own cloud hosting company! We also want extra customisation in terms of our web server and security hardening measures. In addition, future improvements aim to make this software scalable and highly-available.
 
 ## How It Works
 * **Wordpress/NGINX**
@@ -29,6 +33,10 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
   - [ ] [Ceph distributed storage](https://github.com/ceph/ceph-docker/tree/master/examples/kubernetes "Ceph on Kubernetes")
   - [ ] \(Optional\) HA MySQL via sharding, [clustering](https://thenewstack.io/deploy-highly-available-wordpress-instance-statefulset-kubernetes-1-5/ "Deploy a Highly Available WordPress Instance as a StatefulSet in Kubernetes 1.5"), etc.
   - [ ] Add shared and distributed storage to Wordpress/NGINX deployments so they can then be replicated
+- [ ] Enable Drupal CMSs
+- [ ] Enable Joomla CMSs
+- [ ] Enable generic "HTML" deployments
+- [ ] Explore segregating the website deployments in the name of privacy/hardening
  
 ## Installation
 * Create `Secret` objects `mariadb-pass-root` and `redis-pass`.
