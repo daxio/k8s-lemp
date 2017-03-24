@@ -7,6 +7,7 @@ metadata:
 spec:
   ports:
     - port: 3306
+      name: mysql
   selector:
     app: mariadb
     tier: mysql-cache
@@ -18,12 +19,13 @@ metadata:
   name: mariadb
   labels:
     app: mariadb
+    tier: mysql-cache
 spec:
   serviceName: mariadb
   template:
     metadata:
       labels:
-        app: wordpress
+        app: mariadb
         tier: mysql-cache
     spec:
       containers:
