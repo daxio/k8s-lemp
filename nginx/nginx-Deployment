@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: nginx-ingress
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    name: http
+  - port: 443
+    name: https
+  selector:
+    app: nginx
+    tier: ingress
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: nginx-ingress
+  labels:
+    app: nginx
+    tier: ingress
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+        tier: ingress
+    spec:
+      containers:
+      - image: gcr.io/google_containers/nginx-ingress-controller:0.8.3
+        name: nginx
+        imagePullPolicy: Always
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        args:
+        - /nginx-ingress-controller
+        - --default-backend-service=nginx-ingress/default-http-backend
+        - --nginx-configmap=nginx-ingress/nginx
