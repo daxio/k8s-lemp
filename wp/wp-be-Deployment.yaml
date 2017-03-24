@@ -60,8 +60,8 @@ spec:
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mariadb-pass
-              key: password.txt
+              name: mariadb-pass-wp-be-s
+              key: mariadb-pass-wp-be-s.txt
         #optional since nginx can see WP on localhost
         #ports:
         #- containerPort: 9000
