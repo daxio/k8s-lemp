@@ -19,6 +19,7 @@ metadata:
   name: redis
   labels:
     app: redis
+    tier: mysql-cache
 spec:
   strategy:
     type: RollingUpdate
