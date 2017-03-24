@@ -41,7 +41,6 @@ spec:
   template:
     metadata:
       labels:
-        app: wp-be
         tier: frontend
     spec:
       containers:
