@@ -67,8 +67,8 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   ```
 
 * Declare your new website in another YAML file
-  * Make a new copy of the `wp-mywebsite.yaml` file
-  * Update the following values in your new `wp-mywebsite-2.yaml` file to the corresponding website name of your choosing. E.g. `wp-mywebsite-2`, `wp-mywebsite-2-pv-claim`, etc.
+  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-wd` for www.wingdings.com
+  * Update the following values in your new `/wp-wd/wp-wd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-wd`, `wp-wd-pv-claim`, etc.
     * `.metadata.name`
     * `.metadata.labels.app`
     * `Service` definition
@@ -79,6 +79,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
       * `.spec.template.metadata.labels.app`
       * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`
       * `.volumes[0].persistentVolumeClaim.claimName`
+  * Also update the `.metadata.name` value of `00-namespace.yaml`
+  * Finally update the values in both `\*tls.Ingress.yaml` files:
+    * `.metadata.name|namespace`
+    * Both `.host\*` values
+    * `.spec.rules[0].http.paths.backend.serviceName`
+
+* Add a new `PersistentVolume` definition into `gce-volumes.yaml` with your corresponding website short name.
 
 ## Acknowledgements
-This project is based on the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes deployments mentioned previously.
+This project was inspired by the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes applications mentioned previously.
