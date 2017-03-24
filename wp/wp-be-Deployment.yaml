@@ -35,6 +35,7 @@ metadata:
   name: wp-be
   labels:
     app: wp-be
+    tier: frontend
 spec:
   strategy:
     type: RollingUpdate
