@@ -25,6 +25,10 @@ Currently this supports Google Compute Engine as a cloud provider. Other provide
 - [ ] Add diagram detailing the general structure of the cluster.
 - [ ] Configure PHP to listen on a UNIX socket instead of port 9000 and pass the socket file to the `fastcgi_pass` parameter in NGINX.
 - [ ] Explore a logging solution for cluster pods such as [Logstash](https://www.elastic.co/guide/en/logstash/current/docker.html "Running Logstash on Docker")
+- [ ] High availability
+  - [ ] [Ceph distributed storage](https://github.com/ceph/ceph-docker/tree/master/examples/kubernetes "Ceph on Kubernetes")
+  - [ ] \(Optional\) HA MySQL via sharding, [clustering](https://thenewstack.io/deploy-highly-available-wordpress-instance-statefulset-kubernetes-1-5/ "Deploy a Highly Available WordPress Instance as a StatefulSet in Kubernetes 1.5"), etc.
+  - [ ] Add shared and distributed storage to Wordpress/NGINX deployments so they can then be replicated
  
 ## Installation
 * Create `Secret` objects `mariadb-pass-root` and `redis-pass`.
