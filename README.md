@@ -51,7 +51,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 * Create a `ConfigMap` for `nginx`
   ```bash
-  $ kubectl create configmap nginx-config --from-file=configMaps/nginx/
+  $ kubectl create configmap nginx-config --from-file=wp/ConfigMaps/nginx/
   ```
 
 ## Usage
