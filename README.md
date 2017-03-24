@@ -66,8 +66,8 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ commands
   ```
 
-* Declare your new website in another YAML file
-  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-wd` for www.wingdings.com
+* Declare your new website in another directory
+  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-wd` for "www.wingdings.com"
   * Update the following values in your new `/wp-wd/wp-wd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-wd`, `wp-wd-pv-claim`, etc.
     * `.metadata.name`
     * `.metadata.labels.app`
@@ -80,7 +80,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
       * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`
       * `.volumes[0].persistentVolumeClaim.claimName`
   * Also update the `.metadata.name` value of `00-namespace.yaml`
-  * Finally update the values in both `\*tls.Ingress.yaml` files:
+  * Finally update the values in both `\*tls-Ingress.yaml` files:
     * `.metadata.name|namespace`
     * Both `.host\*` values
     * `.spec.rules[0].http.paths.backend.serviceName`
