@@ -39,8 +39,8 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-pass-root
-              key: password.txt
+              name: mariadb-pass-root
+              key: mariadb-pass-root.txt
         ports:
         - containerPort: 3306
           name: mysql
