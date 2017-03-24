@@ -18,6 +18,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wp-be-pv-claim
+  namespace: wp-be
   labels:
     app: wp-be
 spec:
