@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mariadb
+  namespace: core
   labels:
     app: mariadb
 spec:
@@ -17,6 +18,7 @@ apiVersion: extensions/v1beta1
 kind: StatefulSet
 metadata:
   name: mariadb
+  namespace: core
   labels:
     app: mariadb
     tier: mysql-cache
