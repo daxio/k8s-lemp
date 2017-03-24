@@ -25,7 +25,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   * Websites are reached externally via an `nginx` `Ingress` controller. See Kubernetes documentation regarding `Ingress` in the [official docs](https://kubernetes.io/docs/user-guide/ingress/ "Ingress Resources") and on [GitHub](https://github.com/kubernetes/ingress/blob/master/controllers/nginx/README.md "NGINX Ingress Controller").
   * All TLS is terminated at `Ingress` via free Let's Encrypt certificates good for all domains on your cluster. Better yet, certificate issuance is handled automatically with the awesome [Kube Lego](https://github.com/jetstack/kube-lego "Kube Lego").
   
-![Kubernetes LEMP Stack Architecture](k8s-lemp.png "Kubernetes LEMP Stack Architecture")
+![Kubernetes LEMP Stack Architecture](k8s-lemp-stack.png "Kubernetes LEMP Stack Architecture")
 
 ## TODO
 - [x] Add diagram detailing the general structure of the cluster
