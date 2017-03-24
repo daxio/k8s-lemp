@@ -9,8 +9,8 @@ metadata:
 spec:
   # tls:
   # - hosts:
-  #   - echo.example.com
-  #   secretName: echoserver-tls
+  #   - www.broadwayexportcorp.com
+  #   secretName: wp-be-tls
   rules:
   - host: www.broadwayexportcorp.com
     http:
