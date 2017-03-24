@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis
+  namespace: core
   labels:
     app: redis
 spec:
@@ -17,6 +18,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: redis
+  namespace: core
   labels:
     app: redis
     tier: mysql-cache
