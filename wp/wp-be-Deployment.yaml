@@ -42,6 +42,7 @@ spec:
   template:
     metadata:
       labels:
+        name: wp
         tier: frontend
     spec:
       containers:
