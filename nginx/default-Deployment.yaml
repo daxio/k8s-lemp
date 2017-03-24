@@ -1,17 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-http-backend
+  namespace: nginx-ingress
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: default-http-backend
+    tier: ingress
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: default-http-backend
   namespace: nginx-ingress
   labels:
-    app: ?????
+    app: default-http-backend
+    tier: ingress
 spec:
   replicas: 1
   template:
     metadata:
       labels:
         app: default-http-backend
-        tier: ?????
+        tier: ingress
     spec:
       containers:
       - name: default-http-backend
