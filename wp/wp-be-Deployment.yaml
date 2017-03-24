@@ -52,7 +52,7 @@ spec:
         name: wp
         env:
         - name: WORDPRESS_DB_HOST
-          value: mariadb # this must be the value from .metadata.name of the mariadb Service
+          value: mariadb.core.svc.cluster.local # this must be the FQDN of the mariadb Service
         - name: WORDPRESS_DB_NAME
           value: dbBES
         - name: WORDPRESS_DB_USER
