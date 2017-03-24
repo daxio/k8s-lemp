@@ -40,7 +40,7 @@ spec:
             secretKeyRef:
               name: redis-pass
               key: redis-pass.txt
+        args: ["--requirepass $REDIS_PASS"]
         ports:
         - containerPort: 6379
           name: redis
-          args: ["--requirepass $REDIS_PASS"]
