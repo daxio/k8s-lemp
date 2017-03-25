@@ -8,6 +8,8 @@ metadata:
 spec:
   ports:
     - port: 80
+      targetport: 8080
+      protocol: TCP
       name: http
   selector:
     app: wp-be
@@ -73,7 +75,7 @@ spec:
       - image: nginx:1.10
         name: wp-nginx
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: http
         volumeMounts:
         - name: wp-persistent-storage
