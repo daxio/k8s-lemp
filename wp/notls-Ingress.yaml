@@ -9,10 +9,10 @@ metadata:
 spec:
   # tls:
   # - hosts:
-  #   - www.broadwayexportcorp.com
+  #   - dev.broadwayexportcorp.com
   #   secretName: wp-be-tls
   rules:
-  - host: www.broadwayexportcorp.com
+  - host: dev.broadwayexportcorp.com
     http:
       paths:
       - path: /

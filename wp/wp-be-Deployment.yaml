@@ -54,15 +54,15 @@ spec:
         env:
         - name: WORDPRESS_DB_HOST
           value: mariadb.core.svc.cluster.local # this must be the FQDN of the mariadb Service
-        - name: WORDPRESS_DB_NAME
-          value: dbBES
-        - name: WORDPRESS_DB_USER
-          value: wp-be-s
-        - name: WORDPRESS_DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mariadb-pass-wp-be-s
-              key: mariadb-pass-wp-be-s.txt
+        #- name: WORDPRESS_DB_NAME
+        #  value: dbBES
+        #- name: WORDPRESS_DB_USER
+        #  value: wp-be-s
+        #- name: WORDPRESS_DB_PASSWORD
+        #  valueFrom:
+        #    secretKeyRef:
+        #      name: mariadb-pass-wp-be-s
+        #      key: mariadb-pass-wp-be-s.txt
         #optional since nginx can see WP on localhost
         #ports:
         #- containerPort: 9000
