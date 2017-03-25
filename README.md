@@ -41,17 +41,66 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 - [ ] Explore segregating the website deployments in the name of privacy/hardening
  
 ## Installation
-* Create `Secret` objects `mariadb-pass-root` and `redis-pass`.
+### Create Namespaces:
+  ```bash
+  $ kubectl apply -f 00-namespace.yaml
+  namespace "core" created
+  $ kubectl apply -f wp/00-namespace.yaml 
+  namespace "wp-be" created
+  $ kubectl apply -f nginx/00-namespace.yaml 
+  namespace "nginx-ingress" created
+  $ kubectl apply -f lego/00-namespace.yaml 
+  namespace "kube-lego" created
+  ```
+### Create NGINX Ingress and `default-http-backend` (to catch invalid requests to ingress and serve 404):
+ ```bash
+  $ kubectl apply -f nginx/
+  namespace "nginx-ingress" configured
+  service "default-http-backend" created
+  deployment "default-http-backend" created
+  service "nginx" created
+  configmap "nginx" created
+  deployment "nginx" created
+  ```
+  
+* GCE should give you a `LoadBalancer` for your NGINX Service. Watch for your public IP address:
+  ```bash
+  $ watch kubectl describe svc nginx --namespace nginx-ingress
+  ...
+  LoadBalancer Ingress:   1.2.3.4
+  ...
+  ```
+* Go to your domains DNS settings and point your domain to this IP address. After DNS propogates you should see the message "default backend - 404" straight away when visiting your newly set-up domain in a browser. This is the `default-http-backend` doing it's job.
+
+### Create `Secret` objects `mariadb-pass-root` and `redis-pass`:
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-root.txt
   $ openssl rand -base64 20 > /tmp/redis-pass.txt
-  $ kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt
-  $ kubectl create secret generic redis-pass --from-file=/tmp/redis-pass.txt
+  $ kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt --namespace=core
+  $ kubectl create secret generic redis-pass --from-file=/tmp/redis-pass.txt --namespace=core
   ```
-
-* Create a `ConfigMap` for `nginx`
+### Create persistent disks (GCE) and your "core" services:
+* Make sure the disks are in the same `<zone>`as your cluster and that the names match the `pdName` from `gce-volumes.yaml`:
   ```bash
-  $ kubectl create configmap nginx-config --from-file=wp/ConfigMaps/nginx/
+  $ gcloud compute disks create --size=10GB --zone=<zone> wp-be
+  $ gcloud compute disks create --size=10GB --zone=<zone> mariadb
+  $ kubectl apply -f gce-volumes.yaml
+  $ kubectl apply -f mariadb-StatefulSet.yaml
+  $ kubectl apply -f mariadb-StatefulSet.yaml
+  ```
+### Bring up Wordpress/NGINX
+* Create a `ConfigMap` for `nginx`:
+  ```bash
+  $ kubectl create configmap nginx-config --from-file=wp/ConfigMaps/nginx/ --namespace=wp-be 
+  ```
+* Create a new `Secret` for your new DB user
+  ```bash
+  $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-be-s.txt
+  $ kubectl create secret generic mariadb-pass-wp-be-s --from-file=/tmp/mariadb-pass-wp-be-s.txt --namespace=wp-be
+  ```
+* Deploy Wordpress/NGINX and `notls-Ingress`
+  ```bash
+  $ kubectl apply -f wp/wp-be-Deployment.yaml
   ```
 
 ## Usage
