@@ -29,6 +29,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ## TODO
 - [x] Add diagram detailing the general structure of the cluster
+- [ ] The WORDPRESS_DB_PASSWORD doesn't work with a `secretKeyRef` and instead needs the password entered in plaintext in the YAML file
 - [ ] Configure PHP to listen on a UNIX socket instead of port 9000 and pass the socket file to the `fastcgi_pass` parameter in NGINX.
 - [ ] Explore a logging solution for cluster pods such as [Logstash](https://www.elastic.co/guide/en/logstash/current/docker.html "Running Logstash on Docker")
 - [ ] High availability
@@ -89,13 +90,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f redis-Deployment.yaml
   ```
 ### Bring up Wordpress/NGINX
-* Create a new `Secret` for your new DB user
+* Create a new `Secret` for your new DB user __Note: Currently this does not properly convey the password to WP so you must enter the generated password into the YAML by hand.__
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
 * Set environment variables in `wp/wp-wd-Deployment.yaml` to match the Gmail account you want to use and a generated [app password](https://support.google.com/mail/answer/185833?hl=en "Sign in using App Passwords"). This is so Wordpress can use SMTP with your Gmail account to send out e-mails. The environment variables are consumed in the [chepurko/wordpress-fpm-redis](https://github.com/chepurko/wordpress-fpm-redis) image.
-* Deploy Wordpress/NGINX and `notls-Ingress`
+* Deploy Wordpress/NGINX and `notls-Ingress` __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `\*tls_Ingress.yaml` files.__
   ```bash
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml

@@ -16,14 +16,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: wp-be-pv
+  name: wp-wd-pv
   labels:
-    app: wp-be
+    app: wp-wd
 spec:
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
   gcePersistentDisk:
-    pdName: wp-be
+    pdName: wp-wd
     fsType: ext4
