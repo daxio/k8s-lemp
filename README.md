@@ -94,6 +94,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
+* Set environment variables in `wp/wp-wd-Deployment.yaml` to match the Gmail account you want to use and a generated [app password](https://support.google.com/mail/answer/185833?hl=en "Sign in using App Passwords"). This is so Wordpress can use SMTP with your Gmail account to send out e-mails. The environment variables are consumed in the [chepurko/wordpress-fpm-redis](https://github.com/chepurko/wordpress-fpm-redis) image.
 * Deploy Wordpress/NGINX and `notls-Ingress`
   ```bash
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
@@ -114,7 +115,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
       * `.spec.selector.matchLabels.app`
     * `Deployment` definition
       * `.spec.template.metadata.labels.app`
-      * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`
+      * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`. Also use correct values for the MAILER_\* variables
       * `.volumes[0].persistentVolumeClaim.claimName`
   * Also update the `.metadata.name` value of `/wp-dd/00-namespace.yaml`
   * Finally update the values in both `/wp/\*tls-Ingress.yaml` files:
