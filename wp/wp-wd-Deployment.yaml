@@ -65,8 +65,8 @@ spec:
           value: ENTER_A_PASSWORD
           #valueFrom:
           #  secretKeyRef:
-          #    name: mariadb-pass-wp-wd-s
-          #    key: mariadb-pass-wp-wd-s.txt
+          #    name: mariadb-pass-wp-wd
+          #    key: mariadb-pass-wp-wd.txt
         #optional since nginx can see WP on localhost
         #ports:
         #- containerPort: 9000
