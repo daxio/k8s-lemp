@@ -46,7 +46,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f 00-namespace.yaml
   namespace "core" created
   $ kubectl apply -f wp/00-namespace.yaml 
-  namespace "wp-be" created
+  namespace "wp-wd" created
   $ kubectl apply -f nginx/00-namespace.yaml 
   namespace "nginx-ingress" created
   $ kubectl apply -f lego/00-namespace.yaml 
@@ -82,30 +82,50 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 ### Create persistent disks (GCE) and your "core" services:
 * Make sure the disks are in the same `<zone>`as your cluster and that the names match the `pdName` from `gce-volumes.yaml`:
   ```bash
-  $ gcloud compute disks create --size=10GB --zone=<zone> wp-be
+  $ gcloud compute disks create --size=10GB --zone=<zone> wp-wd
   $ gcloud compute disks create --size=10GB --zone=<zone> mariadb
   $ kubectl apply -f gce-volumes.yaml
   $ kubectl apply -f mariadb-StatefulSet.yaml
-  $ kubectl apply -f mariadb-StatefulSet.yaml
+  $ kubectl apply -f redis-Deployment.yaml
   ```
 ### Bring up Wordpress/NGINX
 * Create a new `Secret` for your new DB user
   ```bash
-  $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-be-s.txt
-  $ kubectl create secret generic mariadb-pass-wp-be-s --from-file=/tmp/mariadb-pass-wp-be-s.txt --namespace=wp-be
+  $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
+  $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
 * Deploy Wordpress/NGINX and `notls-Ingress`
   ```bash
-  $ kubectl apply -f wp/wp-be-Deployment.yaml
+  $ kubectl apply -f wp/wp-wd-Deployment.yaml
+  $ kubectl apply -f wp/notls-Ingress.yaml
   ```
 
 ## Usage
 
 ### Adding a website
+* Declare your new website in another directory
+  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-dd` for "www.doodads.com"
+  * Update the following values in your new `/wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
+    * `.metadata.name`
+    * `.metadata.labels.app`
+    * `Service` definition
+      * `.spec.selector.app`
+    * `PersistentVolumeClaim` definition
+      * `.spec.selector.matchLabels.app`
+    * `Deployment` definition
+      * `.spec.template.metadata.labels.app`
+      * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`
+      * `.volumes[0].persistentVolumeClaim.claimName`
+  * Also update the `.metadata.name` value of `/wp-dd/00-namespace.yaml`
+  * Finally update the values in both `/wp/\*tls-Ingress.yaml` files:
+    * `.metadata.name|namespace`
+    * Both `.host\*` values
+    * `.spec.rules[0].http.paths.backend.serviceName`
+    
 * Create a new `Secret` for your new DB user and save it for the next step
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-dd.txt
-  $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-be
+  $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-dd
   $ cat /tmp/mariadb-pass-wp-dd.txt
   ```
 
@@ -121,31 +141,17 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 * Or restore a database from a previous or backed up website:
   ```bash
-  $ kubectl cp /path/to/DBbackup/dbWPWD.bak.sql core/mariadb-0:/root/dbWPWD.bak.sql
+  $ kubectl cp /path/to/DBbackup/dbWPDD.bak.sql core/mariadb-0:/root/dbWPDD.bak.sql
   $ kubectl --namespace=core exec -it mariadb-0 -- /bin/bash
-  root@mariadb-0:/# mysql -u chepwp -p"$MYSQL_ROOT_PASSWORD" dbWPWD < dbWPWD.bak.sql
+  root@mariadb-0:/# mysql -u root -p"$MYSQL_ROOT_PASSWORD" dbWPDD < dbWPDD.bak.sql
   ```
 
-* Declare your new website in another directory
-  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-wd` for "www.wingdings.com"
-  * Update the following values in your new `/wp-wd/wp-wd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-wd`, `wp-wd-pv-claim`, etc.
-    * `.metadata.name`
-    * `.metadata.labels.app`
-    * `Service` definition
-      * `.spec.selector.app`
-    * `PersistentVolumeClaim` definition
-      * `.spec.selector.matchLabels.app`
-    * `Deployment` definition
-      * `.spec.template.metadata.labels.app`
-      * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`
-      * `.volumes[0].persistentVolumeClaim.claimName`
-  * Also update the `.metadata.name` value of `00-namespace.yaml`
-  * Finally update the values in both `\*tls-Ingress.yaml` files:
-    * `.metadata.name|namespace`
-    * Both `.host\*` values
-    * `.spec.rules[0].http.paths.backend.serviceName`
-
-* Add a new `PersistentVolume` definition into `gce-volumes.yaml` with your corresponding website short name.
+* Create another PD and add a new `PersistentVolume` definition into `gce-volumes.yaml` with your corresponding website short name.
+  ```bash
+  $ vim gce # add another PV section changing names to your corresponding short name
+  $ gcloud compute disks create --size=10GB --zone=<zone> wp-dd
+  $ kubectl apply -f gce-volumes.yaml
+  ```
 
 ## Acknowledgements
 This project was inspired by the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes applications mentioned previously.
