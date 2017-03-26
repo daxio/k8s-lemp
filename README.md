@@ -102,15 +102,23 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 ## Usage
 
 ### Adding a website
+* Create a new `Secret` for your new DB user and save it for the next step
+  ```bash
+  $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-dd.txt
+  $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-be
+  $ cat /tmp/mariadb-pass-wp-dd.txt
+  ```
+
 * Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to a new user.
   ```bash
   $ kubectl --namespace=core exec -it mariadb-0 -- /bin/bash
   root@mariadb-0:/# mysql -u root -p"$MYSQL_ROOT_PASSWORD"
+  > CREATE DATABASE dbWPDD DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+  > GRANT ALL PRIVILEGES ON dbWPDD.* TO 'wp-dd'@'%' IDENTIFIED BY '$THE_ACTUAL_PW_FROM_LAST_STEP';
+  > FLUSH PRIVILEGES;
+  > EXIT;
   ```
-* Create a new `Secret` for your new DB user
-  ```bash
-  $ commands
-  ```
+
 * Or restore a database from a previous or backed up website:
   ```bash
   $ kubectl cp /path/to/DBbackup/dbWPWD.bak.sql core/mariadb-0:/root/dbWPWD.bak.sql
