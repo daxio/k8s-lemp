@@ -48,6 +48,7 @@ spec:
     metadata:
       labels:
         name: wp-nginx
+        app: wp-be
         tier: frontend
     spec:
       containers:
