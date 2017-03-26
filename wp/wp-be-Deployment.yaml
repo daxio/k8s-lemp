@@ -74,6 +74,9 @@ spec:
           mountPath: /var/www/html
       - image: chepurko/nginx-fpm
         name: nginx-fpm
+        env:
+        - name: BEHIND_PROXY
+          value: true
         ports:
         - containerPort: 8080
           name: http

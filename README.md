@@ -59,7 +59,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   service "default-http-backend" created
   deployment "default-http-backend" created
   service "nginx" created
-  configmap "nginx" created
+  ~~configmap "nginx" created~~
   deployment "nginx" created
   ```
   
@@ -89,7 +89,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f mariadb-StatefulSet.yaml
   ```
 ### Bring up Wordpress/NGINX
-* Create a `ConfigMap` for `nginx`:
+~~* Create a `ConfigMap` for `nginx`:~~
   ```bash
   $ kubectl create configmap nginx-config --from-file=wp/ConfigMaps/nginx/ --namespace=wp-be 
   ```
