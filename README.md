@@ -111,34 +111,29 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 ### Adding a website
 * Declare your new website in another directory
   * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-dd` for "www.doodads.com"
-  * Update the following values in your new `/wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
-    * `.metadata.name`
-    * `.metadata.labels.app`
-    * `Service` definition
-      * `.spec.selector.app`
-    * `PersistentVolumeClaim` definition
-      * `.spec.selector.matchLabels.app`
-    * `Deployment` definition
-      * `.spec.template.metadata.labels.app`
-      * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`. Also use correct values for the MAILER_\* variables
-      * `.volumes[0].persistentVolumeClaim.claimName`
-  * Also update the `.metadata.name` value of `/wp-dd/00-namespace.yaml`
-  * Finally update the values in both `/wp/\*tls-Ingress.yaml` files:
-    * `.metadata.name|namespace`
-    * Both `.host\*` values
-    * `.spec.rules[0].http.paths.backend.serviceName`
 
-* Create your new namespace
-  ```bash
-  $ kubectl apply -f wp-bc/00-namespace.yaml 
-  namespace "wp-bc" created
-  ```
-    
 * Create a new `Secret` for your new DB user and save it for the next step
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-dd.txt
   $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-dd
   $ cat /tmp/mariadb-pass-wp-dd.txt
+  ```
+
+* Update the short name values in your new `/wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
+  ```bash
+  $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # or whatever you want as a short name
+  $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml wp-dd-Deployment.yaml; do
+      sed -i -r -e 's/wp-wd/wp-dd/' wp-dd/$i
+    done
+  ```
+  * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
+
+* Finally update both `.host\*` values in both `/wp/\*tls-Ingress.yaml` files:
+
+* Create your new namespace
+  ```bash
+  $ kubectl apply -f wp-bc/00-namespace.yaml 
+  namespace "wp-bc" created
   ```
 
 * Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to a new user.
