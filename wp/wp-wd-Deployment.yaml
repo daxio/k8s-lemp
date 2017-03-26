@@ -52,7 +52,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: chepurko/wordpress-fpm-redis
+      - image: chepurko/wordpress-fpm-redis:v1.0
         name: wp-fpm
         env:
         - name: WORDPRESS_DB_HOST
@@ -67,12 +67,6 @@ spec:
           #  secretKeyRef:
           #    name: mariadb-pass-wp-wd-s
           #    key: mariadb-pass-wp-wd-s.txt
-        - name: MAILER_ADMIN_EMAIL
-          value: name@domain.tld
-        - name: MAILER_APP_PASSWORD
-          value: googleapppassword
-        - name: MAILER_YOUR_NAME
-          value: name
         #optional since nginx can see WP on localhost
         #ports:
         #- containerPort: 9000
