@@ -47,24 +47,24 @@ spec:
   template:
     metadata:
       labels:
-        name: wp
+        name: wp-nginx
         tier: frontend
     spec:
       containers:
       - image: chepurko/wordpress-fpm-redis
-        name: wp
+        name: wp-fpm
         env:
         - name: WORDPRESS_DB_HOST
           value: mariadb.core.svc.cluster.local # this must be the FQDN of the mariadb Service
-        #- name: WORDPRESS_DB_NAME
-        #  value: dbBES
-        #- name: WORDPRESS_DB_USER
-        #  value: wp-be-s
-        #- name: WORDPRESS_DB_PASSWORD
-        #  valueFrom:
-        #    secretKeyRef:
-        #      name: mariadb-pass-wp-be-s
-        #      key: mariadb-pass-wp-be-s.txt
+        - name: WORDPRESS_DB_NAME
+          value: dbBES
+        - name: WORDPRESS_DB_USER
+          value: wp-be-s
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-pass-wp-be-s
+              key: mariadb-pass-wp-be-s.txt
         #optional since nginx can see WP on localhost
         #ports:
         #- containerPort: 9000
@@ -72,20 +72,15 @@ spec:
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
-      - image: nginx:1.10
-        name: wp-nginx
+      - image: chepurko/nginx-fpm
+        name: nginx-fpm
         ports:
         - containerPort: 8080
           name: http
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
-        - name: nginx-config
-          mountPath: /etc/nginx
       volumes:
       - name: wp-persistent-storage
         persistentVolumeClaim:
           claimName: wp-be-pv-claim
-      - name: nginx-config
-        configMap:
-          name: nginx-config
