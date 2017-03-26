@@ -67,6 +67,12 @@ spec:
           #  secretKeyRef:
           #    name: mariadb-pass-wp-be-s
           #    key: mariadb-pass-wp-be-s.txt
+        - name: MAILER_ADMIN_EMAIL
+          value: name@domain.tld
+        - name: MAILER_APP_PASSWORD
+          value: googleapppassword
+        - name: MAILER_YOUR_NAME
+          value: name
         #optional since nginx can see WP on localhost
         #ports:
         #- containerPort: 9000

@@ -121,6 +121,12 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
     * `.metadata.name|namespace`
     * Both `.host\*` values
     * `.spec.rules[0].http.paths.backend.serviceName`
+
+* Create your new namespace
+  ```bash
+  $ kubectl apply -f wp-bc/00-namespace.yaml 
+  namespace "wp-bc" created
+  ```
     
 * Create a new `Secret` for your new DB user and save it for the next step
   ```bash
@@ -151,6 +157,12 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ vim gce # add another PV section changing names to your corresponding short name
   $ gcloud compute disks create --size=10GB --zone=<zone> wp-dd
   $ kubectl apply -f gce-volumes.yaml
+  ```
+
+* Apply the YAMLs for you new site and add the IP address of the NGINX `LoadBalancer` Service you originally created to your domain's DNS settings.
+  ```bash
+  $ kubectl apply -f wp-dd/wp-dd-Deployment.yaml
+  $ kubectl apply -f wp-dd/notls-Ingress.yaml
   ```
 
 ## Acknowledgements
