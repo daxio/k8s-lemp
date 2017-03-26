@@ -58,7 +58,7 @@ spec:
         - name: WORDPRESS_DB_HOST
           value: mariadb.core.svc.cluster.local # this must be the FQDN of the mariadb Service
         - name: WORDPRESS_DB_NAME
-          value: dbWD
+          value: dbWPWD
         - name: WORDPRESS_DB_USER
           value: wp-wd
         - name: WORDPRESS_DB_PASSWORD
