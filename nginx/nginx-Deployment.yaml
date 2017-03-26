@@ -69,4 +69,4 @@ spec:
         args:
         - /nginx-ingress-controller
         - --default-backend-service=nginx-ingress/default-http-backend
-        - --nginx-configmap=nginx-ingress/nginx
+        - --configmap=nginx-ingress/nginx
