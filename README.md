@@ -40,7 +40,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 
 ## Prerequisites
-* You need a Kubernetes cluster on Google Compute Engine. This is as following the [official Kubernetes guide](https://kubernetes.io/docs/getting-started-guides/gce/ "Running Kubernetes on Google Compute Engine").
+* You need a Kubernetes cluster on Google Compute Engine. This is as easy as following the [official Kubernetes guide](https://kubernetes.io/docs/getting-started-guides/gce/ "Running Kubernetes on Google Compute Engine").
 * You should be comfortable with basic SQL statements, i.e. creating and managing DBs, users, grants.
 * You also need a domain and access to it's DNS settings. These instructions use the generic domain names www.wingdings.com and www.doodads.com.
 
@@ -95,7 +95,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 ### Bring up WordPress/NGINX
 * Create a new `Secret` for your new DB user
  
-   __Note: Currently [this does not properly convey the password to WP](https://github.com/chepurko/k8s-lemp/issues/1) so you must enter the generated password into the YAML by hand.__
+   __Note: Currently [this does not properly convey the password to WP](https://github.com/chepurko/k8s-lemp/issues/1) so you must enter the generated password into `wp/wp-wd-Deployment.yaml` by hand.__
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
@@ -113,7 +113,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   
 * Deploy WordPress/NGINX and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
  
-   __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `\*tls_Ingress.yaml` files.__
+   __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `wp/*tls_Ingress.yaml` files.__
   ```bash
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml
@@ -130,9 +130,9 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ### Adding a website
 * Declare your new website in another directory
-  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-dd` for "www.doodads.com"
+  * Make a copy of the `wp/` directory and give it a short name with your website in mind, e.g. `wp-dd/` for "www.doodads.com"
 
-* Update the short name values in your new `/wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
+* Update the short name values in your new `wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
   ```bash
   $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # or whatever you want as a short name
   $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml wp-dd-Deployment.yaml; do
@@ -153,7 +153,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
     $ cat /tmp/mariadb-pass-wp-dd.txt
     ```
   
-  * Again in `/wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
+  * Again in `wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
 
   * Finally update both `.host*:` values in both `wp-dd/*tls-Ingress.yaml` files:
 
