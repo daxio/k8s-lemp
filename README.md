@@ -98,12 +98,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
 * Set environment variables in `wp/wp-wd-Deployment.yaml` to match the Gmail account you want to use and a generated [app password](https://support.google.com/mail/answer/185833?hl=en "Sign in using App Passwords"). This is so Wordpress can use SMTP with your Gmail account to send out e-mails. The environment variables are consumed in the [chepurko/wordpress-fpm-redis](https://github.com/chepurko/wordpress-fpm-redis) image.
-* Deploy Wordpress/NGINX and `notls-Ingress`
+* Deploy Wordpress/NGINX and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
  
    __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `\*tls_Ingress.yaml` files.__
   ```bash
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml
+  $ kubectl apply -f lego/kube-lego-Deployment.yaml
   ```
 
 ## Usage
@@ -164,6 +165,11 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   ```bash
   $ kubectl apply -f wp-dd/wp-dd-Deployment.yaml
   $ kubectl apply -f wp-dd/notls-Ingress.yaml
+  ```
+  * Make sure your site is available at http://www.doodads.com
+  
+  ```bash
+  $ kubectl apply -f wp-dd/tls-Ingress.yaml # Enable TLS for your site's Ingress
   ```
 
 ## Acknowledgements
