@@ -122,10 +122,10 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   ```
   
   * Create your new namespace
-  ```bash
-  $ kubectl apply -f wp-bc/00-namespace.yaml 
-  namespace "wp-bc" created
-  ```
+    ```bash
+    $ kubectl apply -f wp-bc/00-namespace.yaml 
+    namespace "wp-bc" created
+    ```
   
   * Create a new `Secret` for your new DB user and save it for the next step
     ```bash
