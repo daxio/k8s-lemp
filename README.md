@@ -29,9 +29,6 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ## TODO
 - [x] Add diagram detailing the general structure of the cluster
-- [ ] The `WORDPRESS_DB_PASSWORD` env doesn't work with a `secretKeyRef` and instead needs the password entered in plaintext in the YAML file
-- [ ] Configure PHP to listen on a UNIX socket instead of port 9000 and pass the socket file to the `fastcgi_pass` parameter in NGINX.
-- [ ] Explore a logging solution for cluster pods such as [Logstash](https://www.elastic.co/guide/en/logstash/current/docker.html "Running Logstash on Docker")
 - [ ] High availability
   - [ ] [Ceph distributed storage](https://github.com/ceph/ceph-docker/tree/master/examples/kubernetes "Ceph on Kubernetes")
   - [ ] \(Optional\) HA MySQL via sharding, [clustering](https://thenewstack.io/deploy-highly-available-wordpress-instance-statefulset-kubernetes-1-5/ "Deploy a Highly Available WordPress Instance as a StatefulSet in Kubernetes 1.5"), etc.
@@ -40,7 +37,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 - [ ] Enable Joomla CMSs
 - [ ] Enable generic "HTML" deployments
 - [ ] Explore segregating the website deployments in the name of privacy/hardening
- 
+
+
+## Prerequisites
+* You need a Kubernetes cluster on Google Compute Engine. This is as following the [official Kubernetes guide](https://kubernetes.io/docs/getting-started-guides/gce/ "Running Kubernetes on Google Compute Engine").
+* You should be comfortable with basic SQL statements, i.e. creating and managing DBs, users, grants.
+* You also need a domain and access to it's DNS settings. These instructions use the generic domain names www.wingdings.com and www.doodads.com.
+
 ## Installation
 ### Create Namespaces:
   ```bash
@@ -53,7 +56,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f lego/00-namespace.yaml 
   namespace "kube-lego" created
   ```
-### Create NGINX Ingress and `default-http-backend` (to catch invalid requests to ingress and serve 404):
+### Create NGINX Ingress and `default-http-backend` (to catch invalid requests to Ingress and serve 404):
  ```bash
   $ kubectl apply -f nginx/
   namespace "nginx-ingress" configured
@@ -71,7 +74,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   LoadBalancer Ingress:   1.2.3.4
   ...
   ```
-* Go to your domains DNS settings and point your domain to this IP address. After DNS propogates you should see the message "default backend - 404" straight away when visiting your newly set-up domain in a browser. This is the `default-http-backend` doing it's job.
+* Go to your domain's DNS settings and point your domain to this IP address. After DNS propogates you should see the message "default backend - 404" straight away when visiting your newly set-up domain in a browser. This is the `default-http-backend` doing it's job.
 
 ### Create `Secret` objects `mariadb-pass-root` and `redis-pass`:
   ```bash
@@ -92,12 +95,22 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 ### Bring up Wordpress/NGINX
 * Create a new `Secret` for your new DB user
  
-   __Note: Currently this does not properly convey the password to WP so you must enter the generated password into the YAML by hand.__
+   __Note: Currently [this does not properly convey the password to WP](https://github.com/chepurko/k8s-lemp/issues/1) so you must enter the generated password into the YAML by hand.__
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
-* Set environment variables in `wp/wp-wd-Deployment.yaml` to match the Gmail account you want to use and a generated [app password](https://support.google.com/mail/answer/185833?hl=en "Sign in using App Passwords"). This is so Wordpress can use SMTP with your Gmail account to send out e-mails. The environment variables are consumed in the [chepurko/wordpress-fpm-redis](https://github.com/chepurko/wordpress-fpm-redis) image.
+
+* Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to the WP user.
+  ```bash
+  $ kubectl --namespace=core exec -it mariadb-0 -- /bin/bash
+  root@mariadb-0:/# mysql -u root -p"$MYSQL_ROOT_PASSWORD"
+  > CREATE DATABASE dbWPWD DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+  > GRANT ALL PRIVILEGES ON dbWPWD.* TO 'wp-wd'@'%' IDENTIFIED BY '$THE_ACTUAL_PW_FROM_LAST_STEP';
+  > FLUSH PRIVILEGES;
+  > EXIT;
+  ```
+  
 * Deploy Wordpress/NGINX and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
  
    __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `\*tls_Ingress.yaml` files.__
@@ -106,6 +119,12 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f wp/notls-Ingress.yaml
   $ kubectl apply -f lego/kube-lego-Deployment.yaml
   ```
+
+  * Make sure your site is available at http://www.wingdings.com
+  
+    ```bash
+    $ kubectl apply -f wp-dd/tls-Ingress.yaml # Enable TLS for your site's Ingress
+    ```
 
 ## Usage
 
@@ -123,8 +142,8 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   
   * Create your new namespace
     ```bash
-    $ kubectl apply -f wp-bc/00-namespace.yaml 
-    namespace "wp-bc" created
+    $ kubectl apply -f wp-dd/00-namespace.yaml 
+    namespace "wp-dd" created
     ```
   
   * Create a new `Secret` for your new DB user and save it for the next step
