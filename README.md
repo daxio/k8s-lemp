@@ -120,22 +120,23 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
       sed -i -r -e 's/wp-wd/wp-dd/' wp-dd/$i
     done
   ```
-  * Update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
-
-* Finally update both `.host\*` values in both `/wp/\*tls-Ingress.yaml` files:
-
-* Create your new namespace
+  
+  * Create your new namespace
   ```bash
   $ kubectl apply -f wp-bc/00-namespace.yaml 
   namespace "wp-bc" created
   ```
+  
+  * Create a new `Secret` for your new DB user and save it for the next step
+    ```bash
+    $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-dd.txt
+    $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-dd
+    $ cat /tmp/mariadb-pass-wp-dd.txt
+    ```
+  
+  * Again in `/wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
 
-* Create a new `Secret` for your new DB user and save it for the next step
-  ```bash
-  $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-dd.txt
-  $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-dd
-  $ cat /tmp/mariadb-pass-wp-dd.txt
-  ```
+  * Finally update both `.host*:` values in both `wp-dd/*tls-Ingress.yaml` files:
 
 * Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to a new user.
   ```bash
@@ -156,7 +157,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 * Create another PD and add a new `PersistentVolume` definition into `gce-volumes.yaml` with your corresponding website short name.
   ```bash
-  $ vim gce # add another PV section changing names to your corresponding short name
+  $ vim gce-volumes.yaml # add another PV section changing names to your corresponding short name
   $ gcloud compute disks create --size=10GB --zone=<zone> wp-dd
   $ kubectl apply -f gce-volumes.yaml
   ```
