@@ -74,11 +74,8 @@ spec:
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
-      - image: chepurko/nginx-fpm
-        name: nginx-fpm
-        env:
-        - name: BEHIND_PROXY
-          value: "true"
+      - image: nginx:1.11
+        name: wp-nginx
         ports:
         - containerPort: 8080
           name: http
