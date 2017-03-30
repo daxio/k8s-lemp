@@ -1,5 +1,5 @@
 # Kubernetes LEMP Stack
-Kubernetes LEMP Stack is a distributed LEMP stack built on top of a Kubernetes cluster. It enables anyone to deploy multiple CMSs (currently Wordpress) for any number of websites.
+Kubernetes LEMP Stack is a distributed LEMP stack built on top of a Kubernetes cluster. It enables anyone to deploy multiple CMSs (currently WordPress) for any number of websites.
 
 Currently this supports Google Compute Engine as a cloud provider. Other providers haven't been tested (things like `PersistentVolume` and `Ingress` depend on your cloud provider).
 
@@ -8,18 +8,18 @@ There are already stable [turn-key deployments for various CMSs](https://github.
 Actually, **k8s LEMP Stack** should be able to serve as your own personal web server farm! Use it as a backend to your own cloud hosting company! We also want extra customisation in terms of our web server and security hardening measures. In addition, future improvements aim to make this software scalable and highly-available.
 
 ## How It Works
-* **Wordpress/NGINX**
-  * Each Wordpress CMS is based on the [wordpress:php7.1-fpm](https://hub.docker.com/r/_/wordpress/ "Official Wordpress Docker image") image with extra required PHP extensions such as `redis`. Wordpress is contained in one `Deployment` controller along with an `nginx` container. The `nginx` image is planned to include build-time security enhancements such as the [NAXSI WAF](https://github.com/nbs-system/naxsi "NBS System NAXSI Web Application Firewall").
-  * Each Wordpress/NGINX `Deployment` gets it's own `PersistentVolume` as well as `Secret` objects for storing sensitive information such as passwords for their DBs.
+* **WordPress/NGINX**
+  * Each WordPress CMS is based on the [wordpress:php7.1-fpm](https://hub.docker.com/r/_/wordpress/ "Official WordPress Docker image") image with extra required PHP extensions such as `redis`. WordPress is contained in one `Deployment` controller along with an `nginx` container. The `nginx` image is planned to include build-time security enhancements such as the [NAXSI WAF](https://github.com/nbs-system/naxsi "NBS System NAXSI Web Application Firewall").
+  * Each WordPress/NGINX `Deployment` gets it's own `PersistentVolume` as well as `Secret` objects for storing sensitive information such as passwords for their DBs.
   
 * **MariaDB**
-  * Initially, the Wordpress/NGINX pods all interface with one `mariadb` `StatefulSet`. This is so anyone can start off with a full-fledged web farm and bring up any number of websites using one `mariadb` instance with a databse for each site. Future improvements will allow for HA and scalable clustered RDBMSs.
+  * Initially, the WordPress/NGINX pods all interface with one `mariadb` `StatefulSet`. This is so anyone can start off with a full-fledged web farm and bring up any number of websites using one `mariadb` instance with a databse for each site. Future improvements will allow for HA and scalable clustered RDBMSs.
   * `mariadb` also gets a `PersistentVolume` and `Secret` objects.
   * Updating `StatefulSet` objects in Kubernetes is [currently a manual process](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations), meaning we have to execute MySQL commands in the `mariadb` pod to add new databases and users.
   
 * **Redis**
   * To reduce hits to the DB we build the WP/NGINX image with the `redis` PHP extension and include a Redis `Deployment`.
-  * WP must be configured to use Redis upon initialising a new WP site by installing and configuring the WP [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for Wordpress") plugin. We protect Redis with a password in a `Secret`.
+  * WP must be configured to use Redis upon initialising a new WP site by installing and configuring the WP [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") plugin. We protect Redis with a password in a `Secret`.
   
 * **Ingress/Kube Lego**
   * Websites are reached externally via an `nginx` `Ingress` controller. See Kubernetes documentation regarding `Ingress` in the [official docs](https://kubernetes.io/docs/user-guide/ingress/ "Ingress Resources") and on [GitHub](https://github.com/kubernetes/ingress/blob/master/controllers/nginx/README.md "NGINX Ingress Controller").
@@ -29,18 +29,21 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ## TODO
 - [x] Add diagram detailing the general structure of the cluster
-- [ ] The `WORDPRESS_DB_PASSWORD` env doesn't work with a `secretKeyRef` and instead needs the password entered in plaintext in the YAML file
-- [ ] Configure PHP to listen on a UNIX socket instead of port 9000 and pass the socket file to the `fastcgi_pass` parameter in NGINX.
-- [ ] Explore a logging solution for cluster pods such as [Logstash](https://www.elastic.co/guide/en/logstash/current/docker.html "Running Logstash on Docker")
 - [ ] High availability
   - [ ] [Ceph distributed storage](https://github.com/ceph/ceph-docker/tree/master/examples/kubernetes "Ceph on Kubernetes")
   - [ ] \(Optional\) HA MySQL via sharding, [clustering](https://thenewstack.io/deploy-highly-available-wordpress-instance-statefulset-kubernetes-1-5/ "Deploy a Highly Available WordPress Instance as a StatefulSet in Kubernetes 1.5"), etc.
-  - [ ] Add shared and distributed storage to Wordpress/NGINX deployments so they can then be replicated
+  - [ ] Add shared and distributed storage to WordPress/NGINX deployments so they can then be replicated
 - [ ] Enable Drupal CMSs
 - [ ] Enable Joomla CMSs
 - [ ] Enable generic "HTML" deployments
 - [ ] Explore segregating the website deployments in the name of privacy/hardening
- 
+
+
+## Prerequisites
+* You need a Kubernetes cluster on Google Compute Engine. This is as easy as following the [official Kubernetes guide](https://kubernetes.io/docs/getting-started-guides/gce/ "Running Kubernetes on Google Compute Engine").
+* You should be comfortable with basic SQL statements, i.e. creating and managing DBs, users, grants.
+* You also need a domain and access to it's DNS settings. These instructions use the generic domain names www.wingdings.com and www.doodads.com.
+
 ## Installation
 ### Create Namespaces:
   ```bash
@@ -53,7 +56,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f lego/00-namespace.yaml 
   namespace "kube-lego" created
   ```
-### Create NGINX Ingress and `default-http-backend` (to catch invalid requests to ingress and serve 404):
+### Create NGINX Ingress and `default-http-backend` (to catch invalid requests to Ingress and serve 404):
  ```bash
   $ kubectl apply -f nginx/
   namespace "nginx-ingress" configured
@@ -71,7 +74,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   LoadBalancer Ingress:   1.2.3.4
   ...
   ```
-* Go to your domains DNS settings and point your domain to this IP address. After DNS propogates you should see the message "default backend - 404" straight away when visiting your newly set-up domain in a browser. This is the `default-http-backend` doing it's job.
+* Go to your domain's DNS settings and point your domain to this IP address. After DNS propogates you should see the message "default backend - 404" straight away when visiting your newly set-up domain in a browser. This is the `default-http-backend` doing it's job.
 
 ### Create `Secret` objects `mariadb-pass-root` and `redis-pass`:
   ```bash
@@ -89,31 +92,47 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f mariadb-StatefulSet.yaml
   $ kubectl apply -f redis-Deployment.yaml
   ```
-### Bring up Wordpress/NGINX
+### Bring up WordPress/NGINX
 * Create a new `Secret` for your new DB user
  
-   __Note: Currently this does not properly convey the password to WP so you must enter the generated password into the YAML by hand.__
+   __Note: Currently [this does not properly convey the password to WP](https://github.com/chepurko/k8s-lemp/issues/1) so you must enter the generated password into `wp/wp-wd-Deployment.yaml` by hand.__
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
-* Set environment variables in `wp/wp-wd-Deployment.yaml` to match the Gmail account you want to use and a generated [app password](https://support.google.com/mail/answer/185833?hl=en "Sign in using App Passwords"). This is so Wordpress can use SMTP with your Gmail account to send out e-mails. The environment variables are consumed in the [chepurko/wordpress-fpm-redis](https://github.com/chepurko/wordpress-fpm-redis) image.
-* Deploy Wordpress/NGINX and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
+
+* Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to the WP user.
+  ```bash
+  $ kubectl --namespace=core exec -it mariadb-0 -- /bin/bash
+  root@mariadb-0:/# mysql -u root -p"$MYSQL_ROOT_PASSWORD"
+  > CREATE DATABASE dbWPWD DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+  > GRANT ALL PRIVILEGES ON dbWPWD.* TO 'wp-wd'@'%' IDENTIFIED BY '$THE_ACTUAL_PW_FROM_LAST_STEP';
+  > FLUSH PRIVILEGES;
+  > EXIT;
+  ```
+  
+* Deploy WordPress/NGINX and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
  
-   __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `\*tls_Ingress.yaml` files.__
+   __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `wp/*tls_Ingress.yaml` files.__
   ```bash
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml
   $ kubectl apply -f lego/kube-lego-Deployment.yaml
   ```
 
+  * Make sure your site is available at http://www.wingdings.com
+  
+    ```bash
+    $ kubectl apply -f wp-dd/tls-Ingress.yaml # Enable TLS for your site's Ingress
+    ```
+
 ## Usage
 
 ### Adding a website
 * Declare your new website in another directory
-  * Make a copy of the `/wp` directory and give it a short name with your website in mind, e.g. `/wp-dd` for "www.doodads.com"
+  * Make a copy of the `wp/` directory and give it a short name with your website in mind, e.g. `wp-dd/` for "www.doodads.com"
 
-* Update the short name values in your new `/wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
+* Update the short name values in your new `wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
   ```bash
   $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # or whatever you want as a short name
   $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml wp-dd-Deployment.yaml; do
@@ -123,8 +142,8 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   
   * Create your new namespace
     ```bash
-    $ kubectl apply -f wp-bc/00-namespace.yaml 
-    namespace "wp-bc" created
+    $ kubectl apply -f wp-dd/00-namespace.yaml 
+    namespace "wp-dd" created
     ```
   
   * Create a new `Secret` for your new DB user and save it for the next step
@@ -134,7 +153,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
     $ cat /tmp/mariadb-pass-wp-dd.txt
     ```
   
-  * Again in `/wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
+  * Again in `wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
 
   * Finally update both `.host*:` values in both `wp-dd/*tls-Ingress.yaml` files:
 
@@ -174,4 +193,4 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   ```
 
 ## Acknowledgements
-This project was inspired by the official Kubernetes [Wordpress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes applications mentioned previously.
+This project was inspired by the official Kubernetes [WordPress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes applications mentioned previously.
