@@ -72,7 +72,7 @@ spec:
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
-      - image: nginx:1.10
+      - image: nginx:1.11
         name: wp-nginx
         ports:
         - containerPort: 8080
