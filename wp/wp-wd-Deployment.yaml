@@ -82,7 +82,12 @@ spec:
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
+        - name: nginx-config
+          mountPath: /etc/nginx
       volumes:
       - name: wp-persistent-storage
         persistentVolumeClaim:
           claimName: wp-wd-pv-claim
+      - name: nginx-config
+        configMap:
+          name: nginx-config

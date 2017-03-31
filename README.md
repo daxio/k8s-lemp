@@ -93,6 +93,11 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl apply -f redis-Deployment.yaml
   ```
 ### Bring up WordPress/NGINX
+* Create a `ConfigMap` for `nginx`
+  ```bash
+  $ kubectl create configmap nginx-config --from-file=wd/ConfigMaps/nginx/ --namespace=wp-wd
+  ```
+
 * Create a new `Secret` for your new DB user
  
    __Note: Currently [this does not properly convey the password to WP](https://github.com/chepurko/k8s-lemp/issues/1) so you must enter the generated password into `wp/wp-wd-Deployment.yaml` by hand.__
