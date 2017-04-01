@@ -8,7 +8,7 @@ metadata:
 spec:
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 80
       protocol: TCP
       name: http
   selector:
@@ -47,13 +47,13 @@ spec:
   template:
     metadata:
       labels:
-        name: wp-nginx
+        name: wp-apache
         app: wp-wd
         tier: frontend
     spec:
       containers:
-      - image: chepurko/wordpress-fpm-redis:v1.0
-        name: wp-fpm
+      - image: chepurko/wordpress-redis:v1.1
+        name: wp
         env:
         - name: WORDPRESS_DB_HOST
           value: mariadb.core.svc.cluster.local # this must be the FQDN of the mariadb Service
@@ -63,18 +63,11 @@ spec:
           value: wp-wd
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
-        volumeMounts:
-        - name: wp-persistent-storage
-          mountPath: /var/www/html
-      - image: chepurko/nginx-fpm
-        name: wp-nginx
-        env:
-          - name: BEHIND_PROXY
-            value: "true"
-          - name: REAL_IP_FROM
-            value: "0.0.0.0/0"
+            secretKeyRef:
+              name: mariadb-pass-wp-wd
+              key: mariadb-pass-wp-wd.txt
         ports:
-        - containerPort: 8080
+        - containerPort: 80
           name: http
         volumeMounts:
         - name: wp-persistent-storage
