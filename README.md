@@ -79,6 +79,9 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 ### Create `Secret` objects `mariadb-pass-root` and `redis-pass`:
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-root.txt
+  # Delete newlines from the password file or else the password won't work in MariaDB
+  $ tr --delete '\n' </tmp/mariadb-pass-root.txt >/tmp/.strippedpassword.txt
+  $ mv /tmp/.strippedpassword.txt /tmp/mariadb-pass-root.txt
   $ openssl rand -base64 20 > /tmp/redis-pass.txt
   $ kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt --namespace=core
   $ kubectl create secret generic redis-pass --from-file=/tmp/redis-pass.txt --namespace=core
@@ -100,9 +103,10 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 * Create a new `Secret` for your new DB user
  
-   __Note: Currently [this does not properly convey the password to WP](https://github.com/chepurko/k8s-lemp/issues/1) so you must enter the generated password into `wp/wp-wd-Deployment.yaml` by hand.__
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-wd.txt
+  $ tr --delete '\n' </tmp/mariadb-pass-wp-wd.txt >/tmp/.strippedpassword.txt
+  $ mv /tmp/.strippedpassword.txt /tmp/mariadb-pass-wp-wd.txt
   $ kubectl create secret generic mariadb-pass-wp-wd --from-file=/tmp/mariadb-pass-wp-wd.txt --namespace=wp-wd
   ```
 
@@ -159,11 +163,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   * Create a new `Secret` for your new DB user and save it for the next step
     ```bash
     $ openssl rand -base64 20 > /tmp/mariadb-pass-wp-dd.txt
+    $ tr --delete '\n' </tmp/mariadb-pass-wp-dd.txt >/tmp/.strippedpassword.txt
+    $ mv /tmp/.strippedpassword.txt /tmp/mariadb-pass-wp-dd.txt
     $ kubectl create secret generic mariadb-pass-wp-dd --from-file=/tmp/mariadb-pass-wp-dd.txt --namespace=wp-dd
     $ cat /tmp/mariadb-pass-wp-dd.txt
     ```
   
-  * Again in `wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and password from `Secret`.
+  * Again in `wp-dd/wp-dd-Deployment.yaml`, update all `.spec.template.spec.containers[0].env[].value` fields to match your new database name, user, and `secretKeyRef`.
 
   * Finally update both `.host*:` values in both `wp-dd/*tls-Ingress.yaml` files:
 
