@@ -62,15 +62,7 @@ spec:
         - name: WORDPRESS_DB_USER
           value: wp-wd
         - name: WORDPRESS_DB_PASSWORD
-          value: ENTER_A_PASSWORD
-          #valueFrom:
-          #  secretKeyRef:
-          #    name: mariadb-pass-wp-wd
-          #    key: mariadb-pass-wp-wd.txt
-        #optional since nginx can see WP on localhost
-        #ports:
-        #- containerPort: 9000
-        #  name: php
+          valueFrom:
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
