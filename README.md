@@ -87,6 +87,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   $ kubectl create secret generic redis-pass --from-file=/tmp/redis-pass.txt --namespace=core
   ```
 ### Create persistent disks (GCE) and your "core" services:
+* Edit the parameters in the StorageClass object in `gce-volumes.yaml` to reflect your correct zone and persistent disk type.
 * Make sure the disks are in the same `<zone>`as your cluster and that the names match the `pdName` from `gce-volumes.yaml`:
   ```bash
   $ gcloud compute disks create --size=10GB --zone=<zone> wp-wd
