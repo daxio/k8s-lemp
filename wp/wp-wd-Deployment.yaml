@@ -29,6 +29,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: slow
   selector:
     matchLabels:
       app: wp-wd
