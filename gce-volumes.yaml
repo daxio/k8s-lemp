@@ -19,6 +19,7 @@ spec:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
+  storageClassName: slow
   gcePersistentDisk:
     pdName: mariadb
     fsType: ext4
@@ -34,6 +35,7 @@ spec:
     storage: 10Gi
   accessModes:
     - ReadWriteOnce
+  storageClassName: slow
   gcePersistentDisk:
     pdName: wp-wd
     fsType: ext4
