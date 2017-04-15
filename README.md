@@ -19,7 +19,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   
 * **Redis**
   * To reduce hits to the DB we build the WP image with the `redis` PHP extension and include a Redis `Deployment`.
-  * WP must be configured to use Redis upon initialising a new WP site by installing and configuring the WP [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") plugin. We protect Redis with a password in a `Secret`.
+  * WP must be configured to use Redis upon initialising a new WP site by installing and configuring the WP [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") plugin.
   
 * **Ingress/Kube Lego**
   * Websites are reached externally via an `nginx` `Ingress` controller. See Kubernetes documentation regarding `Ingress` in the [official docs](https://kubernetes.io/docs/user-guide/ingress/ "Ingress Resources") and on [GitHub](https://github.com/kubernetes/ingress/blob/master/controllers/nginx/README.md "NGINX Ingress Controller").
@@ -29,6 +29,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ## TODO
 - [x] Add diagram detailing the general structure of the cluster
+- [x] Add working password authentication to Redis
 - [ ] High availability
   - [ ] [Ceph distributed storage](https://github.com/ceph/ceph-docker/tree/master/examples/kubernetes "Ceph on Kubernetes")
   - [ ] \(Optional\) HA MySQL via sharding, [clustering](https://thenewstack.io/deploy-highly-available-wordpress-instance-statefulset-kubernetes-1-5/ "Deploy a Highly Available WordPress Instance as a StatefulSet in Kubernetes 1.5"), etc.
@@ -76,15 +77,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   ```
 * Go to your domain's DNS settings and point your domain to this IP address. After DNS propogates you should see the message "default backend - 404" straight away when visiting your newly set-up domain in a browser. This is the `default-http-backend` doing it's job.
 
-### Create `Secret` objects `mariadb-pass-root` and `redis-pass`:
+### Create `Secret` objects `mariadb-pass-root`:
   ```bash
   $ openssl rand -base64 20 > /tmp/mariadb-pass-root.txt
   # Delete newlines from the password file or else the password won't work in MariaDB
   $ tr --delete '\n' </tmp/mariadb-pass-root.txt >/tmp/.strippedpassword.txt
   $ mv /tmp/.strippedpassword.txt /tmp/mariadb-pass-root.txt
-  $ openssl rand -base64 20 > /tmp/redis-pass.txt
   $ kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt --namespace=core
-  $ kubectl create secret generic redis-pass --from-file=/tmp/redis-pass.txt --namespace=core
   ```
 ### Create persistent disks (GCE) and your "core" services:
 * Edit the parameters in the StorageClass object in `gce-volumes.yaml` to reflect your correct zone and persistent disk type.
