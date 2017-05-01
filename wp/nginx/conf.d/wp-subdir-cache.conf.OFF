@@ -37,14 +37,15 @@ server {
     set $skip_cache 1;
   }
 
-        if (!-e $request_filename) {
-                rewrite /wp-admin$ $scheme://$host$uri/ permanent;
-                rewrite ^(/[^/]+)?(/wp-.*) $2 last;
-                rewrite ^/[^/]+(/.*.php)$ $1 last;
-        }
+  if (!-e $request_filename) {
+    rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+    rewrite ^(/[^/]+)?(/wp-.*) $2 last;
+    rewrite ^/[^/]+(/.*.php)$ $1 last;
+  }
 
   location / {
     try_files $uri $uri/ /index.php?$args;
+    include global/*.rules;
   }    
 
   location ~ \.php$ {
@@ -54,7 +55,7 @@ server {
     fastcgi_pass php;
 
     fastcgi_cache_bypass $skip_cache;
-          fastcgi_no_cache $skip_cache;
+    fastcgi_no_cache $skip_cache;
 
     fastcgi_cache WORDPRESS;
     fastcgi_cache_valid  60m;
@@ -77,5 +78,4 @@ server {
   }
 
 include global/*.conf;
-include global/*.rules;
 }

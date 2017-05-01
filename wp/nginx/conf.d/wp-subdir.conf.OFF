@@ -6,7 +6,7 @@ map $blogname $blogid{
     default -999;
 
     #Ref: http://wordpress.org/extend/plugins/nginx-helper/
-    include /var/www/html/wp-content/plugins/nginx-helper/map.conf ;
+    include /var/www/html/wp-content/plugins/nginx-helper/map.conf;
 }
 
 server {
@@ -33,7 +33,8 @@ server {
     }
 
     location / {
-        try_files $uri $uri/ /index.php?$args ;
+        try_files $uri $uri/ /index.php?$args;
+        include global/*.rules;
     }
 
     location ~ \.php$ {
@@ -46,5 +47,4 @@ server {
     #add some rules for static content expiry-headers here
 
 include global/*.conf;
-include global/*.rules;
 }
