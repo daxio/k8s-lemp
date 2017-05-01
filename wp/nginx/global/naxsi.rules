@@ -1,0 +1,14 @@
+#Enable naxsi
+SecRulesEnabled;
+#Enable learning mode
+#LearningMode;
+#Define where blocked requests go
+DeniedUrl "/50x.html";
+#CheckRules, determining when naxsi needs to take action
+CheckRule "$SQL >= 8" BLOCK;
+CheckRule "$RFI >= 8" BLOCK;
+CheckRule "$TRAVERSAL >= 4" BLOCK;
+CheckRule "$EVADE >= 4" BLOCK;
+CheckRule "$XSS >= 8" BLOCK;
+#naxsi logs goes there
+#error_log /var/log/nginx/wpms-naxsi.https.log;

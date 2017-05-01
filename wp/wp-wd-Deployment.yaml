@@ -53,7 +53,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: chepurko/wordpress-redis:v1.1
+      - image: chepurko/wordpress-redis:v1.3-fpm
         name: wp
         env:
         - name: WORDPRESS_DB_HOST
@@ -67,13 +67,43 @@ spec:
             secretKeyRef:
               name: mariadb-pass-wp-wd
               key: mariadb-pass-wp-wd.txt
+        volumeMounts:
+        - name: wp-persistent-storage
+          mountPath: /var/www/html
+        - name: php
+          mountPath: /usr/local/etc/php/conf.d
+      - image: chepurko/nginx-sec-cache:v1.13
+        name: wp-nginx
         ports:
         - containerPort: 80
           name: http
         volumeMounts:
         - name: wp-persistent-storage
           mountPath: /var/www/html
+        - name: nginx
+          mountPath: /etc/nginx
+        - name: nginx-conf-d
+          mountPath: /etc/nginx/conf.d
+        - name: nginx-global
+          mountPath: /etc/nginx/global
+        - name: nginx-html
+          mountPath: /etc/nginx/html
       volumes:
       - name: wp-persistent-storage
         persistentVolumeClaim:
           claimName: wp-wd-pv-claim
+      - name: php
+        configMap:
+          name: php
+      - name: nginx
+        configMap:
+          name: nginx
+      - name: nginx-conf-d
+        configMap:
+          name: nginx-conf-d
+      - name: nginx-global
+        configMap:
+          name: nginx-global
+      - name: nginx-html
+        configMap:
+          name: nginx-html
