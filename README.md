@@ -50,7 +50,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 - [ ] Explore segregating the website deployments in the name of privacy/hardening
 
 ## Installation and Usage
-* Visit the [USAGE.md](USAGE.md)
+Visit the [USAGE.md](USAGE.md)
 
 ## Acknowledgements
 This project was inspired by the official Kubernetes [WordPress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes applications mentioned previously.
