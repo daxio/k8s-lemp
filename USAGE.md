@@ -190,3 +190,84 @@
   ```bash
   $ kubectl apply -f wp-dd/tls-Ingress.yaml # Enable TLS for your site's Ingress
   ```
+
+### Canary deployments
+The best way to push and deploy changes to a production website is with a development or "canary" version which is initially separate from the production site. With WordPress this entails following the [Adding a website](#adding-a-website) section.
+
+* Add an A record in your domain's DNS settings with another name like "dev" pointing to the same Ingress IP address. So the URL of this site would be like dev.doodads.com.
+* Follow the [Adding a website](#adding-a-website) section and use this new URL for your Ingress resources. Also use a new short name such such as `wp-dev-dd` (this is what we will use going forward).
+* Make sure to create another database in MariaDB as well, again using your new "dev" short name.
+* Once your site is available at https://dev.doodads.com, you'll basically have a fresh WordPress site, just as before.
+* Now the best way we have found to get a replica of your production site into this new "dev" domain is to use a backup or replication plugin. This is cleaner and easier than copying raw files and databases and WordPress handles everything such as search/replacing domain names and putting things in the right place. There are various plugins such as [UpdraftPlus](https://wordpress.org/plugins/updraftplus/). Just use one that can backup/restore and clone/migrate your site to a different domain.
+* Now you have two sites, where you can essentially try any new crazy ideas on the *frontend* (themes, design) or *backend* (server/DB configurations) of your canary site until your happy with it and decide to start **live testing**.
+
+*Frontend* changes can esentially be handled by your backup/cloning plugin between the dev and production sites, but for deploying new *backend* we need to get involved with Kubernetes.
+
+You can, of course, try updating the defintions of the production site to your new specs and utilise an in-place `RollingUpdate` to bring up your new backend, but we're going for the professional route here because, well, Kubernetes makes it fun and easy.
+
+With our awesome Kubernetes LEMP Stack setup we can simply create another `deployment` with our new "canary" backend behind our current production `service`. This way we'll have 2 `deployment`s behind our 1 `service` which is answering requests on the main www.doodads.com domain. The 2 `deployments` will be hit round-robin until we take down the old version and just leave the new version running. **All without interupting site traffic**.
+
+* First, start by making sure your dev site is duplicated from your production site and you have your backend configuration setup. You must login to your WordPress dashboard (the one at dev.doodads.com) and change your WordPress and Site Addresses under Settings > General. Once you do this and Save Changes you won't be able to get back in.
+
+* Copy over your new configurations and definitions to you production site's folder
+
+  ```bash
+  $ cd wp-dd/
+  $ cp -R ../wp-dev-dd/wp-dev-dd-Deployment.yaml ../wp-dev-dd/nginx ../wp-dev/php .
+  ```
+
+* Tweak the canary sites's deployment so it's in the same `namespace` and uses the same selector labels as your production site.
+
+  ```bash
+  vim wp-dev-dd-Deployment.yaml
+  ```
+
+  * Delete the `Service` definition in `wp-dev-dd-Deployment.yaml`. We don't want to duplicate this.
+  * Update the two `.namespace` fields in the `PersistentVolumeClaim` and `Deployment` definitions to the namespace of your production site (`wp-dd`).
+  * Update the `.metadata.labels.app` field to match you prod. site (`wp-dd`)
+  * Add the field `.metadata.labels.track` and value `canary`. You should have something like this:
+
+  ```bash
+  ...
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: wp-dev-dd
+    namespace: wp-dd
+    labels:
+      app: wp-dd
+      tier: frontend
+      track: canary
+  ...
+  ```
+
+  * That's all for configuration! Now deploy.
+
+* Start by deleting resources from the dev site's namespace
+
+  ```bash
+  $ kubectl --namespace=wp-dev-dd delete deployment wp-dev-dd && \
+      kubectl --namespace=wp-dev-dd delete pvc wp-dev-dd-pv-claim && \
+      kubectl delete pv wp-dev-dd-pv
+  ```
+
+* Create `ConfigMap`s, and `Secret`s in the `wp-dd` namespace.
+  * Use the commands from previous sections. Tweak the names if you have to avoid duplicates.
+  * You will have to [read out the Secret](https://kubernetes.io/docs/concepts/configuration/secret/#decoding-a-secret) you previously created for you dev site.
+
+* Deploy the canary site and it's PV
+
+  ```bash
+  $ kubectl apply -f ../wp-dev-dd/gce-volume.yaml
+  $ kubectl apply -f wp-dev-dd-Deployment.yaml
+  ```
+
+* If all went according to plan, you should now be hitting both, the prod. and canary Deployments at the URL www.doodads.com, in a round-robin pattern. Awesome!
+
+* When you're satisfied that your canary is stable, delete the old deployment and it's related resources. Something like this is the minimum you would need to delete:
+
+  ```bash
+  $ kubectl --namespace=wp-dd delete deployment wp-dd && \
+      kubectl --namespace=wp-dd delete pvc wp-dd-pv-claim && \
+      kubectl delete pv wp-dd-pv
+  ```
