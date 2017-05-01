@@ -96,10 +96,13 @@
   ```
 
   * Make sure your site is available at http://www.wingdings.com
+  * Finally, enable TLS for you site's Ingress.
   
     ```bash
-    $ kubectl apply -f wp-dd/tls-Ingress.yaml # Enable TLS for your site's Ingress
+    $ kubectl apply -f wp-dd/tls-Ingress.yaml
     ```
+    
+ * Don't forget to install the [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") and [NGINX Helper](https://wordpress.org/plugins/nginx-helper/) plugins if you're going to use Redis and FastCGI cahing, respectively.
 
 ## Usage
 
