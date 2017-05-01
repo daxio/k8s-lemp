@@ -32,6 +32,8 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 * **Ingress/Kube Lego**
   * Websites are reached externally via an `nginx` `Ingress` controller. See Kubernetes documentation regarding `Ingress` in the [official docs](https://kubernetes.io/docs/user-guide/ingress/ "Ingress Resources") and on [GitHub](https://github.com/kubernetes/ingress/blob/master/controllers/nginx/README.md "NGINX Ingress Controller").
   * All TLS is terminated at `Ingress` via free Let's Encrypt certificates good for all domains on your cluster. Better yet, certificate issuance is handled automatically with the awesome [Kube Lego](https://github.com/jetstack/kube-lego "Kube Lego").
+
+* See [**Installation and Usage**](USAGE.md) for instructions on getting up and running.
   
 ![Kubernetes LEMP Stack Architecture](k8s-lemp-stack.png "Kubernetes LEMP Stack Architecture")
 
@@ -46,6 +48,9 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 - [ ] Enable Joomla CMSs
 - [ ] Enable generic "HTML" deployments
 - [ ] Explore segregating the website deployments in the name of privacy/hardening
+
+## Installation and Usage
+* Visit the [USAGE.md](USAGE.md)
 
 ## Acknowledgements
 This project was inspired by the official Kubernetes [WordPress + MySQL sample](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd/ "Persistent Installation of MySQL and WordPress on Kubernetes") and builds on it with the various other official Docker images and Kubernetes applications mentioned previously.
