@@ -23,19 +23,3 @@ spec:
   gcePersistentDisk:
     pdName: mariadb
     fsType: ext4
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: wp-wd-pv
-  labels:
-    app: wp-wd
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: slow
-  gcePersistentDisk:
-    pdName: wp-wd
-    fsType: ext4

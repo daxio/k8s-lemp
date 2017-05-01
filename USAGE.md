@@ -47,15 +47,16 @@
   $ kubectl create secret generic mariadb-pass-root --from-file=/tmp/mariadb-pass-root.txt --namespace=core
   ```
 ### Create persistent disks (GCE) and your "core" services:
-* Edit the parameters in the StorageClass object in `gce-volumes.yaml` to reflect your correct zone and persistent disk type.
-* Make sure the disks are in the same `<zone>`as your cluster and that the names match the `pdName` from `gce-volumes.yaml`:
+* Edit the parameters in the StorageClass object in `core-gce-volumes.yaml` to reflect your correct zone and persistent disk type.
+* Make sure the disks are in the same `<zone>`as your cluster and that the names match the `pdName` from `core-gce-volumes.yaml`:
+  
   ```bash
-  $ gcloud compute disks create --size=10GB --zone=<zone> wp-wd
   $ gcloud compute disks create --size=10GB --zone=<zone> mariadb
-  $ kubectl apply -f gce-volumes.yaml
+  $ kubectl apply -f core-gce-volumes.yaml
   $ kubectl apply -f mariadb-StatefulSet.yaml
   $ kubectl apply -f redis-Deployment.yaml
   ```
+
 ### Bring up WordPress/NGINX
 * Create `ConfigMap`s
 
@@ -77,6 +78,7 @@
   ```
 
 * Manually add a new database in the `mariadb` `StatefulSet` and grant privileges to the WP user.
+
   ```bash
   $ kubectl --namespace=core exec -it mariadb-0 -- /bin/bash
   root@mariadb-0:/# mysql -u root -p"$MYSQL_ROOT_PASSWORD"
@@ -85,11 +87,19 @@
   > FLUSH PRIVILEGES;
   > EXIT;
   ```
+
+* Create the PD for the WordPress/NGINX Deployment.
+
+  ```bash
+  $ gcloud compute disks create --size=10GB --zone=<zone> wp-wd
+  ```
   
-* Deploy WordPress and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
+* Deploy WordPress/NGINX and `notls-Ingress`. Change the email address in `lego/kube-lego-Deployment.yaml` before creating the kube-lego Deployment.
  
    __Note: The default domain name is www.wingdings.com, so you should of course change this to your domain in `wp/*tls_Ingress.yaml` files.__
+  
   ```bash
+  $ kubectl apply -f wp/gce-volume.yaml
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml
   $ kubectl apply -f lego/kube-lego-Deployment.yaml
@@ -110,10 +120,10 @@
 * Declare your new website in another directory
   * Make a copy of the `wp/` directory and give it a short name with your website in mind, e.g. `wp-dd/` for "www.doodads.com"
 
-* Update the short name values in your new `wp-dd/wp-dd-Deployment.yaml` file to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
+* Update the short name values in your new `wp-dd/*.yaml` files to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
   ```bash
   $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # or whatever you want as a short name
-  $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml wp-dd-Deployment.yaml; do
+  $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml wp-dd-Deployment.yaml gce-volume.yaml; do
       sed -i -r -e 's/wp-wd/wp-dd/' wp-dd/$i
     done
   ```
@@ -164,15 +174,14 @@
   root@mariadb-0:/# mysql -u root -p"$MYSQL_ROOT_PASSWORD" dbWPDD < dbWPDD.bak.sql
   ```
 
-* Create another PD and add a new `PersistentVolume` definition into `gce-volumes.yaml` with your corresponding website short name.
+* Create another PD.
   ```bash
-  $ vim gce-volumes.yaml # add another PV section changing names to your corresponding short name
   $ gcloud compute disks create --size=10GB --zone=<zone> wp-dd
-  $ kubectl apply -f gce-volumes.yaml
   ```
 
 * Apply the YAMLs for you new site and add the IP address of the NGINX `LoadBalancer` Service you originally created to your domain's DNS settings.
   ```bash
+  $ kubectl apply -f wp-dd/gce-volume.yaml
   $ kubectl apply -f wp-dd/wp-dd-Deployment.yaml
   $ kubectl apply -f wp-dd/notls-Ingress.yaml
   ```
