@@ -73,7 +73,9 @@ spec:
           mountPath: /var/www/html
         - name: php
           mountPath: /usr/local/etc/php/conf.d
-      - image: chepurko/nginx-sec-cache:v1.13
+        - name: cache
+          mountPath: /var/run/nginx-cache
+      - image: chepurko/nginx-naxsi:v1.0
         name: wp-nginx
         ports:
         - containerPort: 80
@@ -89,6 +91,8 @@ spec:
           mountPath: /etc/nginx/global
         - name: nginx-html
           mountPath: /etc/nginx/html
+        - name: cache
+          mountPath: /var/run/nginx-cache
       volumes:
       - name: wp-persistent-storage
         persistentVolumeClaim:
@@ -108,3 +112,6 @@ spec:
       - name: nginx-html
         configMap:
           name: nginx-html
+      - name: cache
+        emptyDir:
+          medium: "Memory"

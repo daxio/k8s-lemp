@@ -4,7 +4,7 @@
 * You also need a domain and access to it's DNS settings. These instructions use the generic domain names www.wingdings.com and www.doodads.com.
 * Upon deploying WordPress you should install the:
     * [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") plugin to connect your site to the Redis `Deployment` and the
-    * [NGINX Helper](https://wordpress.org/plugins/nginx-helper/) which enables you to clear the FastCGI cache.
+    * A cache-clearing plugin such as [NGINX Cache](https://wordpress.org/plugins/nginx-cache/) if you want to make sure changes appear on your website promptly. There are also other plugins such as [NGINX Helper](https://wordpress.org/plugins/nginx-helper/) but this requires an additional NGINX module and we have not successfully tested this plugin.
 
 ## Installation
 ### Create Namespaces:

@@ -15,8 +15,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 * **NGINX**
   * The NGINX container has multiple handy configurations for multi-site and caching, all easily deployed using `ConfigMap` objects.
-  * We build the NGINX with the [`nginx-sec-cache`](https://github.com/chepurko/nginx-sec-cache) image, which comes with:
-    * [The fork](https://github.com/nginx-modules/ngx_cache_purge) of the [original FRiCLE's module](http://labs.frickle.com/nginx_ngx_cache_purge/)
+  * We build NGINX with the [`nginx-naxsi`](https://github.com/chepurko/nginx-naxsi) image, which comes with:
     * NBS System's [NAXSI module](https://github.com/nbs-system/naxsi). NAXSI means [NGINX](http://nginx.org/) Anti-[XSS](https://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29) & [SQL Injection](https://www.owasp.org/index.php/SQL_injection).
     * Handy configurations for NGINX and the NAXSI web application firewall are also included via `ConfigMap`s.
   
