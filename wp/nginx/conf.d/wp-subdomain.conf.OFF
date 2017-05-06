@@ -1,8 +1,5 @@
 map $http_host $blogid {
     default       -999;
-
-    #Ref: http://wordpress.org/extend/plugins/nginx-helper/
-    include /var/www/html/wp-content/plugins/nginx-helper/map.conf;
 }
 
 server {

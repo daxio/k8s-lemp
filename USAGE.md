@@ -2,8 +2,8 @@
 * You need a Kubernetes cluster on Google Compute Engine. This is as easy as following the [official Kubernetes guide](https://kubernetes.io/docs/getting-started-guides/gce/ "Running Kubernetes on Google Compute Engine").
 * You should be comfortable with basic SQL statements, i.e. creating and managing DBs, users, grants.
 * You also need a domain and access to it's DNS settings. These instructions use the generic domain names www.wingdings.com and www.doodads.com.
-* Upon deploying WordPress you should install the:
-    * [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") plugin to connect your site to the Redis `Deployment` and the
+* Upon deploying WordPress you should install:
+    * [Redis Object Cache](https://wordpress.org/plugins/redis-cache/ "Redis Object Cache plugin for WordPress") plugin to connect your site to the Redis `Deployment`
     * A cache-clearing plugin such as [NGINX Cache](https://wordpress.org/plugins/nginx-cache/) if you want to make sure changes appear on your website promptly. There are also other plugins such as [NGINX Helper](https://wordpress.org/plugins/nginx-helper/) but this requires an additional NGINX module and we have not successfully tested this plugin.
 
 ## Installation
@@ -207,7 +207,7 @@ You can, of course, try updating the defintions of the production site to your n
 
 With our awesome Kubernetes LEMP Stack setup we can simply create another `Deployment` with our new "canary" backend behind our current production `Service`. This way we'll have 2 `Deployment`s behind our 1 `Service` which is answering requests on the main https://www.doodads.com domain. The 2 `Deployments` will be hit round-robin until we take down the old version and just leave the new version running. **All without interrupting site traffic**.
 
-* First, start by making sure your dev site is duplicated from your production site and you have your backend configuration setup. You must login to your WordPress dashboard (the one at https://dev.doodads.com) and change your WordPress and Site Addresses under Settings > General to the address of your production site (e.g. https://www.doodads.com). Once you do this and Save Changes you won't be able to get back in.
+* First, start by making sure your dev site is duplicated from your production site and you have your backend configuration setup. You must login to your WordPress dashboard (the one at https://dev.doodads.com) and change your WordPress and Site Addresses under Settings > General to the address of your production site (e.g. https://www.doodads.com). Once you do this and Save Changes **you won't be able to get back in to this dashboard easily**.
 
 * Copy over your new configurations and definitions to you production site's folder
 
