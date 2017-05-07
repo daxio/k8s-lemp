@@ -1,11 +1,8 @@
-map $http_host $blogid {
-    default       -999;
-}
-
 server {
     server_name _;
 
     root /var/www/html;
+    include global/*.conf;
 
     location / {
         try_files $uri $uri/ /index.php?$args;
@@ -18,21 +15,4 @@ server {
         limit_req zone=one burst=1 nodelay;
         fastcgi_pass php;
     }
-
-    #WPMU Files
-    location ~ ^/files/(.*)$ {
-        try_files /wp-content/blogs.dir/$blogid/$uri /wp-includes/ms-files.php?file=$1 ;
-        access_log off; log_not_found off;      expires max;
-    }
-
-    #WPMU x-sendfile to avoid php readfile()
-    location ^~ /blogs.dir {
-        internal;
-        alias /var/www/html/wp-content/blogs.dir;
-        access_log off;     log_not_found off;      expires max;
-    }
-
-    #add some rules for static content expiry-headers here
-
-include global/*.conf;
 }

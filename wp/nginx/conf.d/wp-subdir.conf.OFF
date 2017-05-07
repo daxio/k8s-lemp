@@ -1,27 +1,8 @@
-map $uri $blogname{
-    ~^(?P<blogpath>/[^/]+/)files/(.*)       $blogpath ;
-}
-
-map $blogname $blogid{
-    default -999;
-}
-
 server {
     server_name _;
 
     root /var/www/html;
-
-    location ~ ^(/[^/]+/)?files/(.+) {
-        try_files /wp-content/blogs.dir/$blogid/files/$2 /wp-includes/ms-files.php?file=$2 ;
-        access_log off;     log_not_found off; expires max;
-    }
-
-    #avoid php readfile()
-    location ^~ /blogs.dir {
-        internal;
-        alias /var/www/html/wp-content/blogs.dir ;
-        access_log off;     log_not_found off; expires max;
-    }
+    include global/*.conf;
 
     if (!-e $request_filename) {
         rewrite /wp-admin$ $scheme://$host$uri/ permanent;
@@ -40,8 +21,4 @@ server {
         limit_req zone=one burst=1 nodelay;
         fastcgi_pass php;
     }
-
-    #add some rules for static content expiry-headers here
-
-include global/*.conf;
 }

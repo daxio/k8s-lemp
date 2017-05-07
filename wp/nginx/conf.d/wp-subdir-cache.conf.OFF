@@ -1,11 +1,3 @@
-map $uri $blogname{
-  ~^(?<blogpath>/[^/]+/)files/(.*)  $blogpath ;
-}
-
-map $blogname $blogid{
-  default -999;
-}
-
 server {
   #@DM - uncomment following line for domain mapping or you will need to add every mapped-domain to server_name list 
   #listen 80 default_server;
@@ -14,6 +6,7 @@ server {
   #server_name_in_redirect off;
 
   root /var/www/html;
+  include global/*.conf;
 
   #fastcgi_cache start
   set $skip_cache 0;
@@ -59,18 +52,4 @@ server {
     fastcgi_cache WORDPRESS;
     fastcgi_cache_valid  60m;
   }
-
-  location ~* ^.+.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
-    access_log off; log_not_found off; expires max;
-  }
-
-  location = /robots.txt { access_log off; log_not_found off; }
-  location ~ /. { deny  all; access_log off; log_not_found off; }
-
-  location ~ ^(/[^/]+/)?files/(?<rt_file>.+) {
-    try_files /wp-content/blogs.dir/$blogid/files/$rt_file /wp-includes/ms-files.php?file=$rt_file ;
-    access_log off; log_not_found off; expires max;
-  }
-
-include global/*.conf;
 }
