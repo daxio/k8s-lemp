@@ -86,11 +86,11 @@ spec:
         - name: nginx
           mountPath: /etc/nginx
         - name: nginx-conf-d
-          mountPath: /etc/nginx/conf.d
+          mountPath: /etc/nginx-conf/conf.d
         - name: nginx-global
-          mountPath: /etc/nginx/global
+          mountPath: /etc/nginx-conf/global
         - name: nginx-html
-          mountPath: /etc/nginx/html
+          mountPath: /etc/nginx-conf/html
         - name: cache
           mountPath: /var/run/nginx-cache
       volumes:

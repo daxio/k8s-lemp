@@ -6,7 +6,7 @@ server {
   #server_name_in_redirect off;
 
   root /var/www/html;
-  include global/*.conf;
+  include /etc/nginx-conf/global/*.conf;
 
   #fastcgi_cache start
   set $skip_cache 0;
@@ -31,7 +31,7 @@ server {
 
   location / {
     try_files $uri $uri/ /index.php?$args;
-    include global/*.rules;
+    include /etc/nginx-conf/global/*.rules;
   }    
 
   location ~ \.php$ {
