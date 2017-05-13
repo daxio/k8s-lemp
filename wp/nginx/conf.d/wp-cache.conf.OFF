@@ -2,7 +2,7 @@ server {
   server_name _;
 
   root /var/www/html;
-  include global/*.conf;
+  include /etc/nginx-conf/global/*.conf;
 
   set $skip_cache 0;
 
@@ -27,7 +27,7 @@ server {
 
   location / {
     try_files $uri $uri/ /index.php?$args;
-    include global/*.rules;
+    include /etc/nginx-conf/global/*.rules;
   }    
 
   location ~ \.php$ {

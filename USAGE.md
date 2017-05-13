@@ -59,6 +59,7 @@
 
 ### Bring up WordPress/NGINX
 * Create `ConfigMap`s
+  * First decide what type of WP site you're going to use and rename the corresponding file in `wp/nginx/conf.d/` to `*.conf` and make sure everything else is named `*.conf.OFF`.
 
   ```bash
   $ kubectl --namespace=wp-wd create configmap php --from-file=wp/php/conf.d
@@ -135,6 +136,7 @@
     ```
 
   * Create `ConfigMap`s
+    * First decide what type of WP site you're going to use and rename the corresponding file in `wp-dd/nginx/conf.d/` to `*.conf` and make sure everything else is named `*.conf.OFF`.
 
     ```bash
     $ kubectl --namespace=wp-dd create configmap php --from-file=wp-dd/php/conf.d
