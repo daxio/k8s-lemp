@@ -1,22 +1,4 @@
 apiVersion: v1
-kind: Service
-metadata:
-  name: wp-wd
-  namespace: wp-wd
-  labels:
-    app: wp-wd
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-      name: http
-  selector:
-    app: wp-wd
-    tier: frontend
-  type: ClusterIP
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wp-wd-pv-claim
@@ -52,6 +34,7 @@ spec:
         name: wp-nginx
         app: wp-wd
         tier: frontend
+        track: stable
     spec:
       containers:
       - image: chepurko/wordpress-redis:v1.3-fpm
