@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wp-wd
+  namespace: wp-wd
+  labels:
+    app: wp-wd
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: wp-wd
+    tier: frontend
+  type: ClusterIP
