@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-wd-pv-claim
+  namespace: wp-wd
+  labels:
+    app: wp-wd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: slow
+  selector:
+    matchLabels:
+      app: wp-wd
