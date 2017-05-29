@@ -3,9 +3,9 @@ data:
   proxy-connect-timeout: "15"
   proxy-read-timeout: "600"
   proxy-send-timeout: "600"
-  hsts-include-subdomains: "false"
   proxy-body-size: "64m"
   server-name-hash-bucket-size: "256"
+  hsts-preload: "true"
 kind: ConfigMap
 metadata:
   namespace: nginx-ingress
