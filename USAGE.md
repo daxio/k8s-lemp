@@ -125,7 +125,7 @@
 
 * Update the short name values in your new `wp-dd/*.yaml` files to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
   ```bash
-  $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # or whatever you want as a short name
+  $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # do the same for the PVC and Service.yaml
   $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml gce-volume.yaml \
       wp-wd-PVC.yaml wp-dd-Deployment.yaml wp-wd-Service.yaml; do
       sed -i -r -e 's/wp-wd/wp-dd/' wp-dd/$i
