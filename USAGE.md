@@ -101,7 +101,9 @@
   
   ```bash
   $ kubectl apply -f wp/gce-volume.yaml
+  $ kubectl apply -f wp/wp-wd-PVC.yaml
   $ kubectl apply -f wp/wp-wd-Deployment.yaml
+  $ kubectl apply -f wp/wp-wd-Service.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml
   $ kubectl apply -f lego/kube-lego-Deployment.yaml
   ```
@@ -124,7 +126,8 @@
 * Update the short name values in your new `wp-dd/*.yaml` files to the corresponding website short name. E.g. `wp-dd`, `wp-dd-pv-claim`, etc.
   ```bash
   $ mv wp-dd/wp-wd-Deployment.yaml wp-dd/wp-dd-Deployment.yaml # or whatever you want as a short name
-  $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml wp-dd-Deployment.yaml gce-volume.yaml; do
+  $ for i in 00-namespace.yaml notls-Ingress.yaml tls-Ingress.yaml gce-volume.yaml \
+      wp-wd-PVC.yaml wp-dd-Deployment.yaml wp-wd-Service.yaml; do
       sed -i -r -e 's/wp-wd/wp-dd/' wp-dd/$i
     done
   ```
@@ -184,7 +187,9 @@
 * Apply the YAMLs for you new site and add the IP address of the NGINX `LoadBalancer` Service you originally created to your domain's DNS settings.
   ```bash
   $ kubectl apply -f wp-dd/gce-volume.yaml
+  $ kubectl apply -f wp-dd/wp-dd-PVC.yaml
   $ kubectl apply -f wp-dd/wp-dd-Deployment.yaml
+  $ kubectl apply -f wp-dd/wp-dd-Service.yaml
   $ kubectl apply -f wp-dd/notls-Ingress.yaml
   ```
   * Make sure your site is available at http://www.doodads.com
@@ -230,7 +235,6 @@ With our awesome Kubernetes LEMP Stack setup we can simply create another `Deplo
 
   ```bash
   $ cd wp-dd-v2
-  $ vim wp-dd-v2-Deployment.yaml
   ```
 
   * Update the two `.namespace` fields in the `PersistentVolumeClaim` and `Deployment` definitions to the namespace of your production site (`wp-dd`).
@@ -280,7 +284,9 @@ With our awesome Kubernetes LEMP Stack setup we can simply create another `Deplo
 
   ```bash
   $ kubectl apply -f gce-volume.yaml
+  $ kubectl apply -f wp-dd-v2-PVC.yaml
   $ kubectl apply -f wp-dd-v2-Deployment.yaml
+  $ kubectl apply -f wp-dd-v2-Service.yaml
   ```
 
 * If all went according to plan, you should now be hitting both, the prod. and canary Deployments at the URL https://www.doodads.com, in a round-robin pattern. Awesome!
