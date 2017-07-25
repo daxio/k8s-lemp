@@ -19,7 +19,7 @@ spec:
         track: stable
     spec:
       containers:
-      - image: chepurko/wordpress-redis:v1.3-fpm
+      - image: chepurko/wordpress-redis:v1.4-fpm
         name: wp
         env:
         - name: WORDPRESS_DB_HOST
@@ -40,7 +40,7 @@ spec:
           mountPath: /usr/local/etc/php/conf.d
         - name: cache
           mountPath: /var/run/nginx-cache
-      - image: chepurko/nginx-naxsi:v1.0
+      - image: chepurko/nginx-naxsi:v1.1
         name: wp-nginx
         ports:
         - containerPort: 80
