@@ -32,7 +32,7 @@ spec:
         tier: mysql-cache
     spec:
       containers:
-      - image: redis:3
+      - image: redis:4
         name: redis
         ports:
         - containerPort: 6379
