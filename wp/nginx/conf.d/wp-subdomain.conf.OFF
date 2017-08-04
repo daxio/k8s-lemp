@@ -12,7 +12,7 @@ server {
     location ~ \.php$ {
         try_files $uri =404;
         include fastcgi_params;
-        limit_req zone=one burst=1 nodelay;
+        limit_req zone=one burst=12 nodelay;
         fastcgi_pass php;
     }
 }
