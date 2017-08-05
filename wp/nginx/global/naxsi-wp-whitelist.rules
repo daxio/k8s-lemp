@@ -141,3 +141,8 @@ BasicRule wl:1000 "mz:$URL:/wp-content/plugins/updraftplus/includes/select2/sele
 BasicRule wl:1315 "mz:$ARGS_VAR:query|$URL:/wp-json/jetpack/v4/jitm";
 #Jetpack Google Fonts
 BasicRule wl:1001 "mz:$URL_X:^/wp-content/plugins/jetpack/css/.*|URL";
+#WooCommerce
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/woocommerce/assets/js/select2/select2.full.min.js|URL";
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/woocommerce/assets/js/stupidtable/stupidtable.min.js|URL";
+#WPML
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/sitepress-multilingual-cms/lib/select2/select2.min.js|URL";

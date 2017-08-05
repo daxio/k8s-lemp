@@ -10,6 +10,7 @@ server {
 
   #fastcgi_cache start
   set $skip_cache 0;
+  set $naxsi_flag_enable "";
 
   # POST requests and urls with a query string should always go to PHP
   if ($request_method = POST) {
@@ -27,6 +28,14 @@ server {
   # Don't use the cache for logged in users or recent commenters
   if ($http_cookie ~* "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in") {
     set $skip_cache 1;
+  }
+
+  if ($request_uri ~* "(^/basket/.*|^/checkout/.*)") {
+    set $naxsi_flag_enable 0;
+  }
+
+  if ($args ~* "(customize_changeset_uuid=.+|wc-ajax=get_refreshed_fragments.*)") {
+    set $naxsi_flag_enable 0;
   }
 
   location / {
