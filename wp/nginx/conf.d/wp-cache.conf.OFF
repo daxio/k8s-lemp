@@ -5,6 +5,7 @@ server {
   include /etc/nginx-conf/global/*.conf;
 
   set $skip_cache 0;
+  set $naxsi_flag_enable "";
 
   # POST requests and urls with a query string should always go to PHP
   if ($request_method = POST) {
@@ -25,6 +26,14 @@ server {
     set $skip_cache 1;
   }
 
+  if ($request_uri ~* "(^/basket/.*|^/checkout/.*)") {
+    set $naxsi_flag_enable 0;
+  }
+
+  if ($args ~* "(customize_changeset_uuid=.+|wc-ajax=get_refreshed_fragments.*)") {
+    set $naxsi_flag_enable 0;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
     include /etc/nginx-conf/global/*.rules;
@@ -33,7 +42,7 @@ server {
   location ~ \.php$ {
     try_files $uri =404; 
     include fastcgi_params;
-    limit_req zone=one burst=1 nodelay;
+    limit_req zone=one burst=12 nodelay;
     fastcgi_pass php;
 
     fastcgi_cache_bypass $skip_cache;
