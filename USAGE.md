@@ -24,9 +24,14 @@
   namespace "nginx-ingress" configured
   service "default-http-backend" created
   deployment "default-http-backend" created
-  service "nginx" created
   configmap "nginx" created
   deployment "nginx" created
+  serviceaccount "nginx-ingress-serviceaccount" created
+  clusterrole "nginx-ingress-clusterrole" created
+  role "nginx-ingress-role" created
+  rolebinding "nginx-ingress-role-nisa-binding" created
+  clusterrolebinding "nginx-ingress-clusterrole-nisa-binding" created
+  service "nginx" created
   ```
   
 * GCE should give you a `LoadBalancer` for your NGINX Service. Watch for your public IP address:
@@ -106,6 +111,7 @@
   $ kubectl apply -f wp/wp-wd-Service.yaml
   $ kubectl apply -f wp/notls-Ingress.yaml
   $ kubectl apply -f lego/kube-lego-Deployment.yaml
+  $ kubectl apply -f lego/kube-lego-RBAC.yaml
   ```
 
   * Make sure your site is available at http://www.wingdings.com

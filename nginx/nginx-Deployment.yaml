@@ -14,8 +14,9 @@ spec:
         app: nginx
         tier: ingress
     spec:
+      serviceAccountName: nginx-ingress-serviceaccount
       containers:
-      - image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.15
+      - image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.9.0
         name: nginx
         imagePullPolicy: Always
         env:
@@ -28,16 +29,29 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
         livenessProbe:
+          failureThreshold: 3
           httpGet:
             path: /healthz
             port: 10254
             scheme: HTTP
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         ports:
         - containerPort: 80
         - containerPort: 443
         args:
         - /nginx-ingress-controller
-        - --default-backend-service=nginx-ingress/default-http-backend
-        - --configmap=nginx-ingress/nginx
+        - --default-backend-service=$(POD_NAMESPACE)/default-http-backend
+        - --configmap=$(POD_NAMESPACE)/nginx
+        - --annotations-prefix=nginx.ingress.kubernetes.io

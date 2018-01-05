@@ -14,51 +14,75 @@ spec:
     tier: mysql-cache
   clusterIP: None
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mariadb
-  namespace: core
+  creationTimestamp: null
   labels:
     app: mariadb
     tier: mysql-cache
+  name: mariadb
+  namespace: core
 spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: mariadb
+      tier: mysql-cache
   serviceName: mariadb
   template:
     metadata:
+      creationTimestamp: null
       labels:
         app: mariadb
         tier: mysql-cache
     spec:
       containers:
-      - image: mariadb:10
-        name: mariadb
-        env:
-          # $ kubectl create secret generic mysql-pass-root --from-file=password.txt
-          # make sure password.txt does not have a trailing newline
+      - env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mariadb-pass-root
               key: mariadb-pass-root.txt
+              name: mariadb-pass-root
+        image: mariadb:10.2.12
+        imagePullPolicy: IfNotPresent
+        name: mariadb
         ports:
         - containerPort: 3306
           name: mysql
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
         volumeMounts:
-        - name: mariadb-persistent-storage
-          mountPath: /var/lib/mysql
+        - mountPath: /var/lib/mysql
+          name: mariadb-persistent-storage
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    type: RollingUpdate
   volumeClaimTemplates:
   - metadata:
-      name: mariadb-persistent-storage
+      creationTimestamp: null
       labels:
         app: mariadb
+      name: mariadb-persistent-storage
     spec:
       accessModes:
-        - ReadWriteOnce
+      - ReadWriteOnce
       resources:
         requests:
           storage: 10Gi
-      storageClassName: slow
       selector:
         matchLabels:
           app: mariadb
+      storageClassName: slow
+    status:
+      phase: Pending
+status:
+  replicas: 0

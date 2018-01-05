@@ -1,29 +1,39 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wp-wd
-  namespace: wp-wd
+  creationTimestamp: null
   labels:
     app: wp-wd
     tier: frontend
     track: stable
+  name: wp-wd
+  namespace: wp-wd
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp-wd
+      name: wp-nginx
+      tier: frontend
+      track: stable
   strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
     type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        name: wp-nginx
         app: wp-wd
+        name: wp-nginx
         tier: frontend
         track: stable
     spec:
       containers:
-      - image: daxio/wordpress-redis:v1.5-fpm
-        name: wp
-        env:
+      - env:
         - name: WORDPRESS_DB_HOST
-          value: mariadb.core.svc.cluster.local # this must be the FQDN of the mariadb Service
+          value: mariadb.core.svc.cluster.local
         - name: WORDPRESS_DB_NAME
           value: dbWPWD
         - name: WORDPRESS_DB_USER
@@ -31,52 +41,74 @@ spec:
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mariadb-pass-wp-wd
               key: mariadb-pass-wp-wd.txt
+              name: mariadb-pass-wp-wd
+        image: daxio/wordpress-redis:v1.6-fpm
+        imagePullPolicy: IfNotPresent
+        name: wp
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
         volumeMounts:
-        - name: wp-persistent-storage
-          mountPath: /var/www/html
-        - name: php
-          mountPath: /usr/local/etc/php/conf.d
-        - name: cache
-          mountPath: /var/run/nginx-cache
-      - image: daxio/nginx-naxsi:v1.1.2
+        - mountPath: /var/www/html
+          name: wp-persistent-storage
+        - mountPath: /usr/local/etc/php/conf.d
+          name: php
+        - mountPath: /var/run/nginx-cache
+          name: cache
+      - image: daxio/nginx-naxsi:v1.1.3
+        imagePullPolicy: IfNotPresent
         name: wp-nginx
         ports:
         - containerPort: 80
           name: http
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
         volumeMounts:
-        - name: wp-persistent-storage
-          mountPath: /var/www/html
-        - name: nginx
-          mountPath: /etc/nginx
-        - name: nginx-conf-d
-          mountPath: /etc/nginx-conf/conf.d
-        - name: nginx-global
-          mountPath: /etc/nginx-conf/global
-        - name: nginx-html
-          mountPath: /etc/nginx-conf/html
-        - name: cache
-          mountPath: /var/run/nginx-cache
+        - mountPath: /var/www/html
+          name: wp-persistent-storage
+        - mountPath: /etc/nginx
+          name: nginx
+        - mountPath: /etc/nginx-conf/conf.d
+          name: nginx-conf-d
+        - mountPath: /etc/nginx-conf/global
+          name: nginx-global
+        - mountPath: /etc/nginx-conf/html
+          name: nginx-html
+        - mountPath: /var/run/nginx-cache
+          name: cache
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
       volumes:
       - name: wp-persistent-storage
         persistentVolumeClaim:
           claimName: wp-wd-pv-claim
-      - name: php
-        configMap:
+      - configMap:
+          defaultMode: 420
           name: php
-      - name: nginx
-        configMap:
+        name: php
+      - configMap:
+          defaultMode: 420
           name: nginx
-      - name: nginx-conf-d
-        configMap:
+        name: nginx
+      - configMap:
+          defaultMode: 420
           name: nginx-conf-d
-      - name: nginx-global
-        configMap:
+        name: nginx-conf-d
+      - configMap:
+          defaultMode: 420
           name: nginx-global
-      - name: nginx-html
-        configMap:
+        name: nginx-global
+      - configMap:
+          defaultMode: 420
           name: nginx-html
-      - name: cache
-        emptyDir:
-          medium: "Memory"
+        name: nginx-html
+      - emptyDir:
+          medium: Memory
+        name: cache
+status: {}
