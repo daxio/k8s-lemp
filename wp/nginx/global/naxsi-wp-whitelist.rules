@@ -146,3 +146,6 @@ BasicRule wl:1000 "mz:$URL:/wp-content/plugins/woocommerce/assets/js/select2/sel
 BasicRule wl:1000 "mz:$URL:/wp-content/plugins/woocommerce/assets/js/stupidtable/stupidtable.min.js|URL";
 #WPML
 BasicRule wl:1000 "mz:$URL:/wp-content/plugins/sitepress-multilingual-cms/lib/select2/select2.min.js|URL";
+#TablePress Responsive Tables
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/tablepress-responsive-tables/css/tablepress-responsive-flip.min.css|URL";
+BasicRule wl:1000 "mz:$URL:/wp-content/plugins/tablepress-responsive-tables/css/responsive.dataTables.min.css|URL";

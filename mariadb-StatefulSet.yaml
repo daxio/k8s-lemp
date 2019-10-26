@@ -46,7 +46,7 @@ spec:
             secretKeyRef:
               key: mariadb-pass-root.txt
               name: mariadb-pass-root
-        image: mariadb:10.2.12
+        image: mariadb:10.3
         imagePullPolicy: IfNotPresent
         name: mariadb
         ports:

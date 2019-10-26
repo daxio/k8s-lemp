@@ -9,9 +9,9 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ## How It Works
 * **WordPress**
-  * Each WordPress CMS is based on the [wordpress:php7.1-fpm](https://hub.docker.com/r/_/wordpress/ "Official WordPress Docker image") image with extra required PHP extensions such as `redis`. WordPress is contained in one `Deployment` controller along with an NGINX container with FastCGI caching and the NAXSI web application firewall.
+  * Each WordPress CMS is based on the [wordpress:php7.3-fpm](https://hub.docker.com/r/_/wordpress/ "Official WordPress Docker image") image with extra required PHP extensions such as `redis`. WordPress is contained in one `Deployment` controller along with an NGINX container with FastCGI caching and the NAXSI web application firewall.
   * Each WordPress `Deployment` gets it's own `PersistentVolume` as well as `Secret` objects for storing sensitive information such as passwords for their DBs.
-  * `ConfigMap`s are used to inject various `php.ini` settings for PHP 7.1.
+  * `ConfigMap`s are used to inject various `php.ini` settings for PHP 7.3.
 
 * **NGINX**
   * The NGINX container has multiple handy configurations for multi-site and caching, all easily deployed using `ConfigMap` objects.
@@ -30,7 +30,7 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
   
 * **Ingress/Kube Lego**
   * Websites are reached externally via an `nginx` `Ingress` controller. See Kubernetes documentation regarding `Ingress` in the [official docs](https://kubernetes.io/docs/user-guide/ingress/ "Ingress Resources") and on [GitHub](https://github.com/kubernetes/ingress/blob/master/controllers/nginx/README.md "NGINX Ingress Controller").
-  * All TLS is terminated at `Ingress` via free Let's Encrypt certificates good for all domains on your cluster. Better yet, certificate issuance is handled automatically with the awesome [Kube Lego](https://github.com/jetstack/kube-lego "Kube Lego").
+  * All TLS is terminated at `Ingress` via free Let's Encrypt certificates good for all domains on your cluster. Better yet, certificate issuance is handled automatically with the awesome [cert-manager](https://github.com/jetstack/cert-manager "cert-manager").
 
 * See [**Installation and Usage**](USAGE.md) for instructions on getting up and running.
   
@@ -38,15 +38,13 @@ Actually, **k8s LEMP Stack** should be able to serve as your own personal web se
 
 ## TODO
 - [x] Add diagram detailing the general structure of the cluster
-- [ ] Add working password authentication to Redis
 - [ ] High availability
   - [ ] [Ceph distributed storage](https://github.com/ceph/ceph-docker/tree/master/examples/kubernetes "Ceph on Kubernetes")
   - [ ] \(Optional\) HA MySQL via sharding, [clustering](https://thenewstack.io/deploy-highly-available-wordpress-instance-statefulset-kubernetes-1-5/ "Deploy a Highly Available WordPress Instance as a StatefulSet in Kubernetes 1.5"), etc.
   - [ ] Add shared and distributed storage to WordPress deployments so they can then be replicated
-- [ ] Enable Drupal CMSs
-- [ ] Enable Joomla CMSs
-- [ ] Enable generic "HTML" deployments
-- [ ] Explore segregating the website deployments in the name of privacy/hardening
+- [ ] PHP socket
+- [ ] New annotation `kubernetes.io/ingress.global-static-ip-name: "wpclust-ingress"`
+- [ ] Migrate to certmanager (with Helm installation)
 
 ## Installation and Usage
 Visit [USAGE.md](USAGE.md).

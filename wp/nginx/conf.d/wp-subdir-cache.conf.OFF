@@ -30,11 +30,7 @@ server {
     set $skip_cache 1;
   }
 
-  if ($request_uri ~* "(^/basket/.*|^/checkout/.*)") {
-    set $naxsi_flag_enable 0;
-  }
-
-  if ($args ~* "(customize_changeset_uuid=.+|wc-ajax=get_refreshed_fragments.*)") {
+  if ($arg_customize_changeset_uuid != "") {
     set $naxsi_flag_enable 0;
   }
 

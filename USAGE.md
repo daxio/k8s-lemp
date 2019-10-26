@@ -1,5 +1,5 @@
 ## Prerequisites
-* You need a Kubernetes cluster on Google Compute Engine. This is as easy as following the [official Kubernetes guide](https://kubernetes.io/docs/getting-started-guides/gce/ "Running Kubernetes on Google Compute Engine").
+* You need a Kubernetes cluster on Google Compute Engine. This is as easy as following the [official Kubernetes guide](https://kubernetes.io/docs/setup/production-environment/turnkey/gce/ "Running Kubernetes on Google Compute Engine").
 * You should be comfortable with basic SQL statements, i.e. creating and managing DBs, users, grants.
 * You also need a domain and access to it's DNS settings. These instructions use the generic domain names www.wingdings.com and www.doodads.com.
 * Upon deploying WordPress you should install:

@@ -6,6 +6,7 @@ metadata:
   annotations:
     # kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/ingress.global-static-ip-name: "wpclust-ingress"
 spec:
   # tls:
   # - hosts:

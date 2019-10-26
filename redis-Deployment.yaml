@@ -42,7 +42,7 @@ spec:
         tier: mysql-cache
     spec:
       containers:
-      - image: redis:4.0.6
+      - image: redis:5
         imagePullPolicy: IfNotPresent
         name: redis
         ports:
